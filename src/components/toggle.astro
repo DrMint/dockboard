@@ -1,0 +1,39 @@
+---
+interface Props {
+    checked: boolean;
+}
+
+const { checked, ...props } = Astro.props;
+---
+
+<div data-component="toggle" data-checked={checked} {...props}>
+    <div></div>
+</div>
+
+<style>
+    [data-component="toggle"] {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        background-color: var(--color-surface-400);
+
+        &[data-checked="true"] {
+            background-color: var(--color-primary);
+            justify-content: flex-end;
+        }
+
+        width: 30px;
+        border-radius: 9999px;
+        padding: 3px;
+
+        cursor: pointer;
+
+        & > div {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            transition: transform 0.2s ease-in-out;
+        }
+    }
+</style>

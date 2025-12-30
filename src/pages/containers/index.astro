@@ -1,0 +1,103 @@
+---
+import Page from "@/components/page.astro";
+import { Containers } from "@/typings/Containers";
+import ContainerIcon from "@/assets/icons/lucide--container.svg";
+import Button from "@/components/button.astro";
+import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
+import { formatUnixTimestamp } from "@/utils/formats";
+import Pill from "@/components/pill.astro";
+import Card from "@/components/card.astro";
+import EmptyTable from "@/components/empty-table.astro";
+
+const containersApi = new Containers();
+const { data: containersData } = await containersApi.containerList(
+    { all: true },
+    { baseUrl: "http://localhost:2375" },
+);
+
+const containers = containersData.sort((a, b) => b.Created! - a.Created!);
+---
+
+<Page
+    title={[{ text: "Containers" }]}
+    icon={ContainerIcon}
+    description="Containers are the runtime instances of images. They can be started, stopped, and inspected."
+>
+    <div slot="header">
+        <Button
+            icon={Trash2Icon}
+            label="Prune"
+            data-action="containers.prune"
+            theme="danger"
+        />
+    </div>
+    <Card>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Image</th>
+                    <th>State</th>
+                    <th>Created</th>
+                    <th>Project</th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    containers.map((container) => (
+                        <tr>
+                            <td>
+                                <a href={`/containers/${container.Id}`}>
+                                    {container.Names![0].substring(1)}
+                                </a>
+                            </td>
+                            <td>
+                                {
+                                    <a href={`/images/${container.ImageID}`}>
+                                        {container.Image!.split(":")[0]}
+                                    </a>
+                                }
+                            </td>
+                            <td>
+                                <Pill
+                                    text={container.State!}
+                                    color={
+                                        container.State === "running"
+                                            ? "var(--color-border-neutral)"
+                                            : "var(--color-border-danger)"
+                                    }
+                                />
+                            </td>
+                            <td>{formatUnixTimestamp(container.Created!)}</td>
+                            <td>
+                                {
+                                    <a
+                                        href={`/projects/${container.Labels!["com.docker.compose.project"]}`}
+                                    >
+                                        {
+                                            container.Labels![
+                                                "com.docker.compose.project"
+                                            ]
+                                        }
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    ))
+                }
+            </tbody>
+        </table>
+        {containers.length === 0 && <EmptyTable message="No containers" />}
+    </Card>
+</Page>
+
+<script>
+    import { actions } from "astro:actions";
+    const button = document.querySelector(
+        "button[data-action='containers.prune']",
+    );
+    button?.addEventListener("click", async () => {
+        await actions.containers.prune();
+        window.location.reload();
+    });
+</script>

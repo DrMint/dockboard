@@ -1,0 +1,77 @@
+---
+import Page from "@/components/page.astro";
+import { Images } from "@/typings/Images";
+import HexagonIcon from "@/assets/icons/lucide--hexagon.svg";
+import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
+import Button from "@/components/button.astro";
+
+const { id } = Astro.params;
+if (!id) {
+  return Astro.redirect("/images");
+}
+
+const images = new Images();
+const { data: imageData } = await images.imageInspect(
+  id,
+  {},
+  { baseUrl: "http://localhost:2375" }
+);
+
+const { data: historyData } = await images.imageHistory(
+  id,
+  {},
+  { baseUrl: "http://localhost:2375" }
+);
+---
+
+<Page
+  title={[
+    { text: "Images", href: "/images" },
+    { text: imageData?.RepoTags![0] },
+  ]}
+  icon={HexagonIcon}
+>
+  <div slot="header">
+    <Button
+      icon={Trash2Icon}
+      label="Delete"
+      data-action="images.delete"
+      data-id={id}
+      theme="danger"
+    />
+  </div>
+  <h2>Image</h2>
+  <pre>{JSON.stringify(imageData, null, 2)}</pre>
+  <h2>History</h2>
+  <pre>{JSON.stringify(historyData, null, 2)}</pre>
+</Page>
+
+<style>
+  h2 {
+    margin-top: 3em;
+    margin-bottom: 1em;
+  }
+</style>
+
+<script>
+  import { actions } from "astro:actions";
+
+  document
+    .querySelectorAll<HTMLButtonElement>("button[data-action]")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        const { action, id } = button.dataset;
+        if (!action || !id) {
+          return;
+        }
+        switch (action) {
+          case "images.delete":
+            await actions.images.delete({ id });
+            window.location.href = "/images";
+            break;
+          default:
+            break;
+        }
+      });
+    });
+</script>

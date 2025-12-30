@@ -1,0 +1,23 @@
+---
+import Page from "@/components/page.astro";
+import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
+import Card from "@/components/card.astro";
+import EmptyTable from "@/components/empty-table.astro";
+---
+
+<Page
+    title={[{ text: "Builds" }]}
+    icon={WrenchIcon}
+    description="Builds are the process of creating images from source code."
+>
+    <Card>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+        </table>
+        <EmptyTable message="No builds" />
+    </Card>
+</Page>

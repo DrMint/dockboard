@@ -1,0 +1,293 @@
+---
+import type { SvgComponent } from "astro/types";
+import Sidebar from "./sidebar.astro";
+
+interface Props {
+  title?: {
+    text: string;
+    href?: string;
+  }[];
+  icon?: SvgComponent;
+  description?: string;
+}
+
+const { title, icon: Icon, description } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Dockboard</title>
+  </head>
+  <body>
+    <Sidebar />
+    <main>
+      <div class="header">
+        <div class="header-title">
+          {
+            title && (
+              <h1>
+                {Icon && <Icon />}
+                {title.map((t, index) => (
+                  <>
+                    {t.href !== undefined ? (
+                      <a href={t.href}>{t.text}</a>
+                    ) : (
+                      t.text
+                    )}
+                    {index < title.length - 1 && <span> › </span>}
+                  </>
+                ))}
+              </h1>
+            )
+          }
+          <slot name="header" />
+        </div>
+        {description && <p>{description}</p>}
+      </div>
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style>
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 64px;
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      & > svg {
+        width: 36px;
+        height: 36px;
+      }
+
+      & > span {
+        color: var(--color-text-300);
+        font-weight: 400;
+      }
+
+      & > a {
+        text-decoration-line: underline;
+        text-decoration-color: var(--color-text-600);
+        text-underline-offset: 0.12em;
+
+        transition-property: text-decoration-color;
+        transition-duration: 100ms;
+        transition-timing-function: ease-in-out;
+
+        &:hover {
+          text-decoration-color: var(--color-text-100);
+        }
+      }
+    }
+
+    p {
+      max-width: 60em;
+      color: var(--color-text-400);
+      font-size: 90%;
+      line-height: 1.5;
+    }
+  }
+
+  body {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    margin: 0;
+    height: 100dvh;
+    background-color: var(--color-surface-100);
+  }
+
+  main {
+    padding: 48px;
+    overflow: auto;
+  }
+</style>
+
+<style is:global>
+  :root {
+    font-family: Inter, sans-serif;
+    font-feature-settings:
+      "liga" 1,
+      "calt" 1; /* fix for Chrome */
+    color: var(--color-text-100);
+    line-height: 1;
+  }
+
+  @supports (font-variation-settings: normal) {
+    :root {
+      font-family: InterVariable, sans-serif;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-primary: #1d63ed;
+      --color-primary-light: #3b82f6;
+
+      --color-border-neutral: #3f3f46;
+      --color-border-success: #56b35b;
+      --color-border-warning: #ffa500;
+      --color-border-danger: #a84444;
+
+      --color-surface-100: #131315;
+      --color-surface-200: #18181b;
+      --color-surface-250: #212124;
+      --color-surface-300: #27272a;
+      --color-surface-400: #3f3f46;
+      --color-surface-500: #52525b;
+
+      --color-text-100: #f4f4f5;
+      --color-text-200: #e4e4e7;
+      --color-text-300: #d4d4d8;
+      --color-text-400: #a1a1aa;
+      --color-text-500: #71717a;
+      --color-text-600: #52525b;
+      --color-text-700: #3f3f46;
+      --color-text-800: #27272a;
+      --color-text-900: #18181b;
+
+      --color-text-success: #77e21f;
+      --color-text-warning: #d4a958;
+      --color-text-danger: #c95959;
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --color-primary: #1d63ed;
+      --color-primary-light: #3b82f6;
+
+      --color-primary: #1d63ed;
+      --color-border-neutral: #b5b5c7;
+      --color-border-success: #77e21f;
+      --color-border-warning: #ffa500;
+      --color-border-danger: #db5252;
+
+      --color-surface-100: #f4f4f5;
+      --color-surface-200: #ededee;
+      --color-surface-250: #e6e6e7;
+      --color-surface-300: #d7d7d8;
+      --color-surface-400: #bababb;
+      --color-surface-500: #7f7f80;
+
+      --color-text-100: #09090b;
+      --color-text-200: #18181b;
+      --color-text-300: #27272a;
+      --color-text-400: #3f3f46;
+      --color-text-500: #52525b;
+      --color-text-600: #71717a;
+      --color-text-700: #a1a1aa;
+      --color-text-800: #d4d4d8;
+      --color-text-900: #f4f4f5;
+
+      --color-text-success: #77e21f;
+      --color-text-warning: #9b6500;
+      --color-text-danger: #ad0000;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    margin: 0;
+    line-height: 1;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  tr a {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+
+    transition-property: text-decoration-color;
+    transition-duration: 100ms;
+    transition-timing-function: ease-in-out;
+
+    display: block;
+  }
+
+  tr:hover a {
+    text-decoration-color: var(--color-text-100);
+    text-underline-offset: 0.12em;
+  }
+
+  th,
+  td {
+    padding: 16px;
+  }
+
+  th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--color-text-400);
+    font-size: 75%;
+    text-transform: uppercase;
+  }
+
+  thead {
+    border-bottom: 1px solid var(--color-surface-300);
+  }
+
+  tr {
+    border-top: 1px solid var(--color-surface-300);
+
+    &:first-of-type {
+      border-top: none;
+    }
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  details {
+    padding: 16px;
+    border: 1px solid var(--color-surface-300);
+    border-radius: 10px;
+    background-color: var(--color-surface-200);
+    width: fit-content;
+
+    summary {
+      cursor: pointer;
+      width: fit-content;
+      font-weight: 500;
+    }
+
+    & > pre {
+      padding: 16px;
+      border-radius: 10px;
+
+      background-color: var(--color-surface-250);
+      color: var(--color-text-300);
+
+      @media (prefers-color-scheme: light) {
+        background-color: var(--color-text-400);
+        color: var(--color-surface-100);
+      }
+    }
+  }
+</style>

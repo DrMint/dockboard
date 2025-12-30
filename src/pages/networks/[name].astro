@@ -1,0 +1,21 @@
+---
+import Page from "@/components/page.astro";
+import { Networks } from "@/typings/Networks";
+import NetworkIcon from "@/assets/icons/lucide--network.svg";
+
+const { name } = Astro.params;
+if (!name) {
+    return Astro.redirect("/networks");
+}
+
+const networks = new Networks();
+const { data: networkData } = await networks.networkInspect(
+    name,
+    {},
+    { baseUrl: "http://localhost:2375" },
+);
+---
+
+<Page title={[{ text: "Networks", href: "/networks" }, { text: name }]} icon={NetworkIcon}>
+    <pre>{JSON.stringify(networkData, null, 2)}</pre>
+</Page>

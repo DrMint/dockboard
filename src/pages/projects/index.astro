@@ -1,0 +1,120 @@
+---
+import Page from "@/components/page.astro";
+import FileCodeIcon from "@/assets/icons/lucide--file-code.svg";
+import Toggle from "@/components/toggle.astro";
+import Card from "@/components/card.astro";
+import { Project } from "@/models/project";
+import Tag from "@/components/tag.astro";
+
+const projects = await Project.getAllProjects();
+projects.sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<Page
+  title={[{ text: "Projects" }]}
+  icon={FileCodeIcon}
+  description="Projects streamline application deployment by controlling the entire stack (services, networks, and volumes) in a single Docker Compose configuration file."
+>
+  <Card>
+    <table>
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Resources</th>
+          <th>Enabled</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          projects.map((project) => (
+            <tr>
+              <td>
+                <a class="project-name" href={`/projects/${project.name}`}>
+                  {project.name}
+                </a>
+              </td>
+              <td class="resources">
+                {project.containers.length > 0 && (
+                  <Tag
+                    label="Containers"
+                    value={project.containers.length}
+                    tooltip={project.containers.map((container) => container.name).join("\n")}
+                  />
+                )}
+                {project.networks.length > 0 && (
+                  <Tag
+                    label="Networks"
+                    value={project.networks.length}
+                    tooltip={project.networks.map((network) => network.name).join("\n")}
+                  />
+                )}
+                {project.volumes.length > 0 && (
+                  <Tag
+                    label="Volumes"
+                    value={project.volumes.length}
+                    tooltip={project.volumes.map((volume) => volume.name).join("\n")}
+                  />
+                )}
+              </td>
+              <td>
+                {project.dockerComposeFilePath && (
+                  <Toggle
+                    checked={project.isRunning}
+                    data-action={
+                      project.isRunning ? "projects.down" : "projects.up"
+                    }
+                    data-path={project.dockerComposeFilePath}
+                  />
+                )}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </Card>
+</Page>
+
+<script>
+  import { actions } from "astro:actions";
+  document.querySelectorAll<HTMLElement>("[data-action]").forEach((el) => {
+    el.addEventListener("click", async () => {
+      const { action, path } = el.dataset;
+      if (!action || !path) {
+        return;
+      }
+      switch (action) {
+        case "projects.up":
+          el.dataset.checked = "true";
+          await actions.projects.up({ path });
+          window.location.reload();
+          break;
+        case "projects.down":
+          el.dataset.checked = "false";
+          await actions.projects.down({ path });
+          window.location.reload();
+          break;
+        default:
+          break;
+      }
+    });
+  });
+</script>
+
+<style>
+  .project-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: var(--color-border-warning);
+    }
+  }
+  .resources {
+    display: flex;
+    gap: 32px;
+  }
+</style>

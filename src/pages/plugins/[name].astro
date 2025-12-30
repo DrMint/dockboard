@@ -1,0 +1,19 @@
+---
+import Page from "@/components/page.astro";
+import { Plugins } from "@/typings/Plugins";
+import PlugIcon from "@/assets/icons/lucide--plug.svg";
+
+const { name } = Astro.params;
+if (!name) {
+    return Astro.redirect("/plugins");
+}
+
+const plugins = new Plugins();
+const { data: pluginData } = await plugins.pluginInspect(name, {
+    baseUrl: "http://localhost:2375",
+});
+---
+
+<Page title={[{ text: "Plugins", href: "/plugins" }, { text: pluginData!.Name }]} icon={PlugIcon}>
+    <pre>{JSON.stringify(pluginData, null, 2)}</pre>
+</Page>

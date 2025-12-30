@@ -1,0 +1,26 @@
+{
+  "name": "dockboard",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check",
+    "generate:api": "swagger-typescript-api generate --path https://raw.githubusercontent.com/moby/moby/docker-v29.1.3/api/swagger.yaml -o ./src/typings --modular"
+  },
+  "dependencies": {
+    "astro": "^5.16.6",
+    "fast-glob": "^3.3.3",
+    "timeago.js": "^4.0.2",
+    "undici": "^7.16.0",
+    "yaml": "^2.8.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "swagger-typescript-api": "^13.2.16",
+    "typescript": "^5.9.3"
+  }
+}

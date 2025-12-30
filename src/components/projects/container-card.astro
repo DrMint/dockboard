@@ -1,0 +1,134 @@
+---
+import Card from "../card.astro";
+import type { Container } from "@/models/container";
+import Pill from "../pill.astro";
+import { capitalize } from "@/utils/formats";
+import type { ContainerSummary } from "@/typings/data-contracts";
+
+interface Props {
+  container: Container;
+}
+
+const { container } = Astro.props;
+
+const getContainerStateColor = (
+  state: NonNullable<ContainerSummary["State"]>
+) => {
+  switch (state) {
+    case "running":
+      return "var(--color-border-success)";
+    case "paused":
+    case "created":
+    case "restarting":
+    case "removing":
+      return "var(--color-border-warning)";
+    case "dead":
+    case "exited":
+      return "var(--color-border-danger)";
+  }
+};
+---
+
+<Card
+  href={container.instance ? `/containers/${container.instance.Id}` : undefined}
+>
+  <div class="card-header">
+    <h3>{container.name}</h3>
+    {
+      container.instance ? (
+        <Pill
+          text={capitalize(container.instance.State!)}
+          color={getContainerStateColor(container.instance.State!)}
+        />
+      ) : (
+        <Pill text="Down" color="var(--color-border-danger)" />
+      )
+    }
+  </div>
+  {
+    container.networks.length > 0 && (
+      <div class="card-meta">
+        <p>Networks:</p>
+        <div>
+          {container.networks.map((network) => (
+            <Pill text={network} color="var(--color-surface-300)" fill small />
+          ))}
+        </div>
+      </div>
+    )
+  }
+  {
+    container.ports.length > 0 && (
+      <div class="card-meta">
+        <p>Ports:</p>
+        <div>
+          {container.ports.map((port) => (
+            <Pill text={port} color="var(--color-surface-300)" fill small />
+          ))}
+        </div>
+      </div>
+    )
+  }
+  {
+    container.dependsOn.length > 0 && (
+      <div class="card-meta">
+        <p>Depends on:</p>
+        <div>
+          {container.dependsOn.map((service) => (
+            <Pill text={service} color="var(--color-surface-300)" fill small />
+          ))}
+        </div>
+      </div>
+    )
+  }
+  {
+    container.mounts.length > 0 && (
+      <div class="card-meta">
+        <p>Mounts:</p>
+        <div>
+          {container.mounts.map((mount) => (
+            <Pill text={mount} color="var(--color-surface-300)" fill small />
+          ))}
+        </div>
+      </div>
+    )
+  }
+</Card>
+
+<style>
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    & + * {
+      border-top: 1px solid var(--color-surface-300);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    & + * {
+      margin-top: 12px;
+    }
+
+    & > p {
+      font-size: 80%;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+</style>

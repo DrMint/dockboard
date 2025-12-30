@@ -1,0 +1,96 @@
+---
+import Card from "../card.astro";
+import type { Network } from "@/models/network";
+import Pill from "../pill.astro";
+
+interface Props {
+  network: Network;
+}
+
+const { network } = Astro.props;
+
+const MAX_CONTAINERS_TO_SHOW = 4;
+---
+
+<Card href={network.instance ? `/networks/${network.name}` : undefined}>
+  <div class="card-header">
+    <h3>{network.name}</h3>
+    {
+      network.instance ? (
+        <Pill text={"Up"} color={"var(--color-border-success)"} />
+      ) : (
+        <Pill text="Down" color="var(--color-border-danger)" />
+      )
+    }
+  </div>
+  {
+    network.containers.length > 0 && (
+      <div class="card-meta">
+        <p>Containers:</p>
+        <div>
+          {network.containers.slice(0, MAX_CONTAINERS_TO_SHOW).map((container) => (
+            <Pill
+              text={container}
+              color="var(--color-surface-300)"
+              fill
+              small
+            />
+          ))}
+          {network.containers.length > MAX_CONTAINERS_TO_SHOW && (
+            <Pill
+              text={`+${network.containers.length - MAX_CONTAINERS_TO_SHOW} more`}
+              color="var(--color-surface-300)"
+              fill
+              small
+            />
+          )}
+        </div>
+      </div>
+    )
+  }
+  {
+    !network.config && (
+      <div class="card-meta">
+        External
+      </div>
+    )
+  }
+</Card>
+
+<style>
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    & + * {
+      border-top: 1px solid var(--color-surface-300);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    & + * {
+      margin-top: 12px;
+    }
+
+    & > p {
+      font-size: 80%;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+</style>

@@ -1,0 +1,266 @@
+---
+import Page from "@/components/page.astro";
+import FileCodeIcon from "@/assets/icons/lucide--file-code.svg";
+import Button from "@/components/button.astro";
+import PlayIcon from "@/assets/icons/lucide--play.svg";
+import CircleDivideIcon from "@/assets/icons/lucide--circle-divide.svg";
+import DownloadIcon from "@/assets/icons/lucide--download.svg";
+import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
+import { Project } from "@/models/project";
+import Card from "@/components/card.astro";
+import Pill from "@/components/pill.astro";
+import TriangleAlertIcon from "@/assets/icons/lucide--triangle-alert.svg";
+import CircleAlertIcon from "@/assets/icons/lucide--circle-alert.svg";
+import CircleQuestionMarkIcon from "@/assets/icons/lucide--circle-question-mark.svg";
+import ContainerCard from "@/components/projects/container-card.astro";
+import NetworkCard from "@/components/projects/network-card.astro";
+
+const { name } = Astro.params;
+if (!name) {
+  return Astro.redirect("/projects");
+}
+
+const project = await Project.fromName(name);
+const lintResults = project.configLinter();
+---
+
+<Page
+  title={[{ text: "Projects", href: "/projects" }, { text: name }]}
+  icon={FileCodeIcon}
+>
+  <div slot="header" class="header-buttons">
+    <Button
+      icon={DownloadIcon}
+      label="Pull"
+      data-action="projects.pull"
+      data-path={project.dockerComposeFilePath}
+    />
+    <Button
+      icon={WrenchIcon}
+      label="Build"
+      data-action="projects.build"
+      data-path={project.dockerComposeFilePath}
+    />
+    <Button
+      visible={!project.isRunning}
+      icon={PlayIcon}
+      label="Start"
+      data-action="projects.up"
+      data-path={project.dockerComposeFilePath}
+      theme="success"
+    />
+    <Button
+      visible={project.isRunning}
+      icon={CircleDivideIcon}
+      label="Stop"
+      data-action="projects.down"
+      data-path={project.dockerComposeFilePath}
+      theme="danger"
+    />
+  </div>
+
+  <section>
+    <h2>Containers</h2>
+    <div class="grid">
+      {
+        project.containers.map((container) => (
+          <ContainerCard container={container} />
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    project.networks.length > 0 && (
+      <section>
+        <h2>Networks</h2>
+        <div class="grid">
+          {project.networks.map((network) => (
+            <NetworkCard network={network} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    project.volumes.length > 0 && (
+      <section>
+        <h2>Volumes</h2>
+        <div class="grid">
+          {project.volumes.map((volume) => (
+            <Card
+              href={volume.instance ? `/volumes/${volume.name}` : undefined}
+            >
+              <div class="card-header">
+                <h3>{volume.name}</h3>
+
+                <Pill
+                  text={volume.instance ? "Up" : "Down"}
+                  color={
+                    volume.instance
+                      ? "var(--color-border-success)"
+                      : "var(--color-border-danger)"
+                  }
+                />
+              </div>
+            </Card>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    lintResults.length > 0 && (
+      <section>
+        <h2>Lint</h2>
+        <ul class="lint-results">
+          {lintResults.map((result) => (
+            <li data-level={result.level}>
+              {result.level === "error" ? (
+                <TriangleAlertIcon />
+              ) : result.level === "warning" ? (
+                <CircleAlertIcon />
+              ) : (
+                <CircleQuestionMarkIcon />
+              )}{" "}
+              {result.message}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section>
+    <h2>Debug</h2>
+    <div class="debug-content">
+      <details>
+        <summary>Docker Compose file ({project.dockerComposeFilePath})</summary>
+        <pre>{project.dockerComposeFileContent}</pre>
+      </details>
+      <details>
+        <summary>Parsed config</summary>
+        <pre>{JSON.stringify(project.config, null, 2)}</pre>
+      </details>
+      <details>
+        <summary>Containers</summary>
+        <pre>{JSON.stringify(project.containers, null, 2)}</pre>
+      </details>
+      <details>
+        <summary>Networks</summary>
+        <pre>{JSON.stringify(project.networks, null, 2)}</pre>
+      </details>
+      <details>
+        <summary>Volumes</summary>
+        <pre>{JSON.stringify(project.volumes, null, 2)}</pre>
+      </details>
+      {
+        lintResults.length > 0 && (
+          <details>
+            <summary>Config linter</summary>
+            <div class="config-linter">
+              {project.configLinter().map((result) => (
+                <div data-level={result.level}>
+                  <span>{result.message}</span>
+                </div>
+              ))}
+            </div>
+          </details>
+        )
+      }
+    </div>
+  </section>
+
+  <style>
+    h2 {
+      margin-bottom: 1em;
+    }
+
+    section {
+      margin-block: 3em;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .lint-results {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      padding-left: 0;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+
+        &[data-level="error"] {
+          color: var(--color-text-danger);
+        }
+
+        &[data-level="warning"] {
+          color: var(--color-text-warning);
+        }
+
+        &[data-level="info"] {
+          color: var(--color-text-neutral);
+        }
+      }
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .debug-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  </style>
+
+  <script>
+    import { actions } from "astro:actions";
+    document.querySelectorAll<HTMLElement>("[data-action]").forEach((el) => {
+      el.addEventListener("click", async () => {
+        const { action, path } = el.dataset;
+        if (!action || !path) {
+          return;
+        }
+        switch (action) {
+          case "projects.up":
+            await actions.projects.up({ path });
+            window.location.reload();
+            break;
+          case "projects.down":
+            await actions.projects.down({ path });
+            window.location.reload();
+            break;
+          case "projects.build":
+            await actions.projects.build({ path });
+            window.location.reload();
+            break;
+          case "projects.pull":
+            await actions.projects.pull({ path });
+            window.location.reload();
+            break;
+          default:
+            break;
+        }
+      });
+    });
+  </script>
+</Page>

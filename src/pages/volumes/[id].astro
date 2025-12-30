@@ -1,0 +1,17 @@
+---
+import Page from "@/components/page.astro";
+import { Volumes } from "@/typings/Volumes";
+import HardDriveIcon from "@/assets/icons/lucide--hard-drive.svg";
+
+const { id } = Astro.params;
+if (!id) {
+    return Astro.redirect("/volumes");
+}
+
+const volumes = new Volumes();
+const { data: volumeData } = await volumes.volumeInspect(id, { baseUrl: "http://localhost:2375" });
+---
+
+<Page title={[{ text: "Volumes", href: "/volumes" }, { text: volumeData!.Name }]} icon={HardDriveIcon}>
+    <pre>{JSON.stringify(volumeData, null, 2)}</pre>
+</Page>

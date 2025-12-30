@@ -1,0 +1,65 @@
+---
+import type { SvgComponent } from "astro/types";
+
+interface Props {
+    icon?: SvgComponent;
+    label?: string;
+    visible?: boolean;
+    theme?: "danger" | "warning" | "success";
+}
+
+const { icon: Icon, label, visible = true, theme, ...props } = Astro.props;
+
+if (!visible) {
+    return null;
+}
+---
+
+<button {...props} data-theme={theme}>
+    {Icon && <Icon />}
+    {label && <span>{label}</span>}
+</button>
+
+<style>
+    button {
+        cursor: pointer;
+        border: 1px solid color-mix(in srgb, white 20%, transparent);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 10px;
+        padding-block: 5px;
+        padding-inline: 10px;
+
+        background-color: color-mix(in srgb, white 5%, transparent);
+        color: var(--color-text-100);
+        border-color: color-mix(in srgb, white 20%, transparent);
+
+        & > span {
+            font-size: 90%;
+        }
+
+        &[data-theme="danger"] {
+            background-color: color-mix(in srgb, #ff0000 20%, transparent);
+            color: var(--color-text-100);
+            border-color: color-mix(in srgb, #ff0000 20%, transparent);
+        }
+
+        &[data-theme="warning"] {
+            background-color: color-mix(in srgb, #ffa500 20%, transparent);
+            color: var(--color-text-100);
+            border-color: color-mix(in srgb, #ffa500 20%, transparent);
+        }
+
+        &[data-theme="success"] {
+            background-color: color-mix(in srgb, #a3ff57 10%, transparent);
+            color: var(--color-text-100);
+            border-color: color-mix(in srgb, #a3ff57 20%, transparent);
+        }
+
+        & > svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+</style>
