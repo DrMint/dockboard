@@ -92,7 +92,11 @@ export class Project {
         (name) =>
           new Network(
             name,
-            { name: this.name, config: this.config, runningResources: this.runningResources },
+            {
+              name: this.name,
+              config: this.config,
+              runningResources: this.runningResources,
+            },
             this.config?.networks?.[name],
             this.runningResources.networks.find(
               (network) => network.Name === name
@@ -124,9 +128,7 @@ export class Project {
   }
 
   get isRunning(): boolean {
-    return this.containers.some(
-      (container) => container.isRunning
-    );
+    return this.containers.some((container) => container.isRunning);
   }
 
   configLinter(): CheckResult[] {
@@ -243,29 +245,26 @@ export class Project {
     const dockerComposeFileContent = dockerComposeFile
       ? await readFile(dockerComposeFile, "utf8")
       : null;
-    const allRunningResources = await this.getRunningResources();
     return new Project(
       name,
       dockerComposeFileContent,
       dockerComposeFile,
-      allRunningResources
+      await this.getRunningResources()
     );
   }
 
   static async getAllProjects(): Promise<Project[]> {
-    const allRunningResources = await this.getRunningResources();
     const dockerComposeFiles = await this.getListOfDockerComposeFiles();
     return Promise.all(
-      dockerComposeFiles.map(async (file) => {
-        const name = this.getProjectNameFromPath(file);
-        const dockerComposeFileContent = await readFile(file, "utf8");
-        return new Project(
-          name,
-          dockerComposeFileContent,
-          file,
-          allRunningResources
-        );
-      })
+      dockerComposeFiles.map(
+        async (file) =>
+          new Project(
+            this.getProjectNameFromPath(file),
+            await readFile(file, "utf8"),
+            file,
+            await this.getRunningResources()
+          )
+      )
     );
   }
 
