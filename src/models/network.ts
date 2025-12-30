@@ -1,24 +1,26 @@
 import type { NetworkSummary } from "@/typings/data-contracts";
 import type { DockerComposeConfig } from "./docker-compose-schema";
-import type { Project, RunningResources } from "./project";
+import type { RunningResources } from "./project";
 
 export class Network {
   constructor(
     public readonly name: string,
-    private readonly project: Project,
-    private readonly runningResources: RunningResources,
-    public readonly config?: NonNullable<
+    private readonly project: {
+      name: string;
+      config: DockerComposeConfig | null;
+      runningResources: RunningResources;
+    },
+    private readonly config?: NonNullable<
       DockerComposeConfig["networks"]
     >[string],
-    public readonly instance?: NetworkSummary
+    private readonly instance?: NetworkSummary
   ) {}
 
   get containers(): string[] {
     const containersFromConfig = this.containersFromConfig;
-    const runningContainers =
-      this.runningResources.containers.filter(
-        (container) => container.NetworkSettings?.Networks?.[this.name]
-      ).map((container) => container.Names![0].slice(1));
+    const runningContainers = this.project.runningResources.containers
+      .filter((container) => container.NetworkSettings?.Networks?.[this.name])
+      .map((container) => container.Names![0].slice(1));
 
     const uniqueContainers = new Set([
       ...containersFromConfig,
@@ -26,6 +28,14 @@ export class Network {
     ]);
 
     return Array.from(uniqueContainers);
+  }
+
+  get isExternal(): boolean {
+    return this.config?.external === true;
+  }
+
+  get isRunning(): boolean {
+    return this.instance !== undefined;
   }
 
   private get containersFromConfig(): string[] {

@@ -3,7 +3,6 @@ import Card from "../card.astro";
 import type { Container } from "@/models/container";
 import Pill from "../pill.astro";
 import { capitalize } from "@/utils/formats";
-import type { ContainerSummary } from "@/typings/data-contracts";
 
 interface Props {
   container: Container;
@@ -11,9 +10,7 @@ interface Props {
 
 const { container } = Astro.props;
 
-const getContainerStateColor = (
-  state: NonNullable<ContainerSummary["State"]>
-) => {
+const getContainerStateColor = (state: Container["state"]) => {
   switch (state) {
     case "running":
       return "var(--color-border-success)";
@@ -24,26 +21,19 @@ const getContainerStateColor = (
       return "var(--color-border-warning)";
     case "dead":
     case "exited":
+    case "down":
       return "var(--color-border-danger)";
   }
 };
 ---
 
-<Card
-  href={container.instance ? `/containers/${container.instance.Id}` : undefined}
->
+<Card href={container.isInstanciated ? `/containers/${container.name}` : undefined}>
   <div class="card-header">
     <h3>{container.name}</h3>
-    {
-      container.instance ? (
-        <Pill
-          text={capitalize(container.instance.State!)}
-          color={getContainerStateColor(container.instance.State!)}
-        />
-      ) : (
-        <Pill text="Down" color="var(--color-border-danger)" />
-      )
-    }
+    <Pill
+      text={capitalize(container.state)}
+      color={getContainerStateColor(container.state)}
+    />
   </div>
   {
     container.networks.length > 0 && (

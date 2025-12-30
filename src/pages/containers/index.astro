@@ -47,7 +47,7 @@ const containers = containersData.sort((a, b) => b.Created! - a.Created!);
                     containers.map((container) => (
                         <tr>
                             <td>
-                                <a href={`/containers/${container.Id}`}>
+                                <a href={`/containers/${container.Names![0].substring(1)}`}>
                                     {container.Names![0].substring(1)}
                                 </a>
                             </td>

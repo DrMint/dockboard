@@ -2,6 +2,7 @@
 import Card from "../card.astro";
 import type { Network } from "@/models/network";
 import Pill from "../pill.astro";
+import LogInIcon from "@/assets/icons/lucide--log-in.svg";
 
 interface Props {
   network: Network;
@@ -12,11 +13,12 @@ const { network } = Astro.props;
 const MAX_CONTAINERS_TO_SHOW = 4;
 ---
 
-<Card href={network.instance ? `/networks/${network.name}` : undefined}>
+<Card href={network.isRunning ? `/networks/${network.name}` : undefined}>
   <div class="card-header">
+    {network.isExternal && <div title="External network"><LogInIcon /></div>}
     <h3>{network.name}</h3>
     {
-      network.instance ? (
+      network.isRunning ? (
         <Pill text={"Up"} color={"var(--color-border-success)"} />
       ) : (
         <Pill text="Down" color="var(--color-border-danger)" />
@@ -28,14 +30,16 @@ const MAX_CONTAINERS_TO_SHOW = 4;
       <div class="card-meta">
         <p>Containers:</p>
         <div>
-          {network.containers.slice(0, MAX_CONTAINERS_TO_SHOW).map((container) => (
-            <Pill
-              text={container}
-              color="var(--color-surface-300)"
-              fill
-              small
-            />
-          ))}
+          {network.containers
+            .slice(0, MAX_CONTAINERS_TO_SHOW)
+            .map((container) => (
+              <Pill
+                text={container}
+                color="var(--color-surface-300)"
+                fill
+                small
+              />
+            ))}
           {network.containers.length > MAX_CONTAINERS_TO_SHOW && (
             <Pill
               text={`+${network.containers.length - MAX_CONTAINERS_TO_SHOW} more`}
@@ -48,13 +52,6 @@ const MAX_CONTAINERS_TO_SHOW = 4;
       </div>
     )
   }
-  {
-    !network.config && (
-      <div class="card-meta">
-        External
-      </div>
-    )
-  }
 </Card>
 
 <style>
@@ -63,6 +60,17 @@ const MAX_CONTAINERS_TO_SHOW = 4;
     justify-content: space-between;
     align-items: center;
     gap: 8px;
+
+    & svg {
+      width: 16px;
+      height: 16px;
+      translate: 0 2px;
+      margin-right: 4px;
+    }
+
+    & h3 {
+      line-height: 1.3;
+    }
 
     & + * {
       border-top: 1px solid var(--color-surface-300);

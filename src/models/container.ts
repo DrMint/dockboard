@@ -1,14 +1,13 @@
 import type { ContainerSummary } from "@/typings/data-contracts";
 import type { DockerComposeConfig } from "./docker-compose-schema";
-import type { Project } from "./project";
 
 export class Container {
   constructor(
     public readonly name: string,
-    private readonly project?: Project,
-    public readonly config?: DockerComposeConfig["services"][string],
-    public readonly instance?: ContainerSummary
-  ) {}
+    private readonly project?: { name: string; config: DockerComposeConfig | null },
+    private readonly config?: DockerComposeConfig["services"][string],
+    private readonly instance?: ContainerSummary
+  ) { }
 
   get networks(): string[] {
     const networksFromConfig = this.networksFromConfig;
@@ -41,6 +40,18 @@ export class Container {
     const mounts = this.config?.volumes;
     if (!mounts) return [];
     return mounts.map((mount) => mount.split(":")[0]);
+  }
+
+  get isInstanciated(): boolean {
+    return this.instance !== undefined;
+  }
+
+  get isRunning(): boolean {
+    return this.instance?.State === "running";
+  }
+
+  get state(): NonNullable<ContainerSummary["State"]> | "down" {
+    return this.instance?.State ?? "down";
   }
 
   private get networksFromConfig(): string[] {

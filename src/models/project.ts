@@ -73,7 +73,7 @@ export class Project {
         );
         return new Container(
           name,
-          this,
+          { name: this.name, config: this.config },
           this.config?.services?.[name],
           runningContainer
         );
@@ -92,8 +92,7 @@ export class Project {
         (name) =>
           new Network(
             name,
-            this,
-            this.runningResources,
+            { name: this.name, config: this.config, runningResources: this.runningResources },
             this.config?.networks?.[name],
             this.runningResources.networks.find(
               (network) => network.Name === name
@@ -126,7 +125,7 @@ export class Project {
 
   get isRunning(): boolean {
     return this.containers.some(
-      (container) => container.instance?.State === "running"
+      (container) => container.isRunning
     );
   }
 

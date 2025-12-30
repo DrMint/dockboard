@@ -1,0 +1,156 @@
+---
+import Page from "@/components/page.astro";
+import { Containers } from "@/typings/Containers";
+import ContainerIcon from "@/assets/icons/lucide--container.svg";
+import PlayIcon from "@/assets/icons/lucide--play.svg";
+import PauseIcon from "@/assets/icons/lucide--pause.svg";
+import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
+import RefreshCwIcon from "@/assets/icons/lucide--refresh-cw.svg";
+import SkullIcon from "@/assets/icons/lucide--skull.svg";
+import CircleDivideIcon from "@/assets/icons/lucide--circle-divide.svg";
+import Button from "@/components/button.astro";
+
+const { name } = Astro.params;
+if (!name) {
+  return Astro.redirect("/containers");
+}
+
+const containers = new Containers();
+const { data: containerData } = await containers.containerInspect(
+  name,
+  {},
+  { baseUrl: "http://localhost:2375" }
+);
+
+const isPaused = containerData!.State!.Paused!;
+const isRunning = containerData!.State!.Running!;
+
+const isStartable = !isRunning;
+const isStoppable = isRunning;
+const isRestartable = isRunning;
+const isKillable = isRunning;
+const isDeletable = !isRunning;
+const isPausable = isRunning && !isPaused;
+const isUnpausable = isRunning && isPaused;
+---
+
+<Page
+  title={[
+    { text: "Containers", href: "/containers" },
+    { text: containerData?.Name!.substring(1) },
+  ]}
+  icon={ContainerIcon}
+>
+  <div slot="header">
+    <Button
+      visible={isPausable}
+      icon={PauseIcon}
+      label="Pause"
+      data-id={name}
+      data-action="containers.pause"
+    />
+    <Button
+      visible={isUnpausable}
+      icon={PlayIcon}
+      label="Unpause"
+      data-id={name}
+      data-action="containers.unpause"
+    />
+    <Button
+      visible={isStoppable}
+      icon={CircleDivideIcon}
+      label="Stop"
+      data-id={name}
+      data-action="containers.stop"
+      theme="warning"
+    />
+    <Button
+      visible={isStartable}
+      icon={PlayIcon}
+      label="Start"
+      data-id={name}
+      data-action="containers.start"
+      theme="success"
+    />
+    <Button
+      visible={isRestartable}
+      icon={RefreshCwIcon}
+      label="Restart"
+      data-id={name}
+      data-action="containers.restart"
+    />
+    <Button
+      visible={isKillable}
+      icon={SkullIcon}
+      label="Kill"
+      data-id={name}
+      data-action="containers.kill"
+      theme="danger"
+    />
+    <Button
+      visible={isDeletable}
+      icon={Trash2Icon}
+      label="Delete"
+      data-id={name}
+      data-action="containers.delete"
+      theme="danger"
+    />
+  </div>
+  <pre>{JSON.stringify(containerData, null, 2)}</pre>
+</Page>
+
+<script>
+  import { actions } from "astro:actions";
+
+  document
+    .querySelectorAll<HTMLButtonElement>("button[data-action][data-id]")
+    .forEach((button) => {
+      button.addEventListener("click", async () => {
+        const { action, id } = button.dataset;
+        if (!action || !id) {
+          return;
+        }
+        switch (action) {
+          case "containers.start":
+            await actions.containers.start({ id });
+            window.location.reload();
+            break;
+          case "containers.stop":
+            await actions.containers.stop({ id });
+            window.location.reload();
+            break;
+          case "containers.restart":
+            await actions.containers.restart({ id });
+            window.location.reload();
+            break;
+          case "containers.kill":
+            await actions.containers.kill({ id });
+            window.location.reload();
+            break;
+          case "containers.pause":
+            await actions.containers.pause({ id });
+            window.location.reload();
+            break;
+          case "containers.unpause":
+            await actions.containers.unpause({ id });
+            window.location.reload();
+            break;
+          case "containers.delete":
+            const result = await actions.containers.delete({ id });
+            if (!result.error) {
+              window.location.href = "/containers";
+            }
+            break;
+          default:
+            break;
+        }
+      });
+    });
+</script>
+
+<style>
+  div {
+    display: flex;
+    gap: 8px;
+  }
+</style>
