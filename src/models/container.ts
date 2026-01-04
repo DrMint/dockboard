@@ -28,7 +28,7 @@ export class Container {
   }
 
   get imageId(): string | undefined {
-    return this.instance?.ImageID
+    return this.instance?.ImageID;
   }
 
   get imageName(): string | undefined {

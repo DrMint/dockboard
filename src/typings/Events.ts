@@ -50,7 +50,7 @@ export class Events<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<EventMessage, ErrorResponse>({
       path: `/events`,

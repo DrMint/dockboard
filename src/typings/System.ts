@@ -40,7 +40,7 @@ export class System<
        */
       verbose?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<
       {

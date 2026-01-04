@@ -37,7 +37,7 @@ export class Plugins<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<Plugin[], ErrorResponse>({
       path: `/plugins`,
@@ -62,7 +62,7 @@ export class Plugins<
        */
       remote: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<PluginPrivilege[], ErrorResponse>({
       path: `/plugins/privileges`,
@@ -95,7 +95,7 @@ export class Plugins<
       name?: string;
     },
     body: PluginPrivilege[],
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/plugins/pull`,
@@ -138,7 +138,7 @@ export class Plugins<
        */
       force?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<Plugin, ErrorResponse>({
       path: `/plugins/${name}`,
@@ -164,7 +164,7 @@ export class Plugins<
        */
       timeout?: number;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/plugins/${name}/enable`,
@@ -186,7 +186,7 @@ export class Plugins<
       /** Force disable a plugin even if still in use. */
       force?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/plugins/${name}/disable`,
@@ -213,7 +213,7 @@ export class Plugins<
       remote: string;
     },
     body: PluginPrivilege[],
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/plugins/${name}/upgrade`,
@@ -240,7 +240,7 @@ export class Plugins<
       name: string;
     },
     tarContext: File,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/plugins/create`,

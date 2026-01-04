@@ -129,7 +129,7 @@ export class Build<
        */
       version?: "1" | "2";
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/build`,
@@ -182,7 +182,7 @@ export class Build<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<
       {

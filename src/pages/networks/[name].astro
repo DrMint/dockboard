@@ -5,31 +5,34 @@ import { Host } from "@/models/host";
 
 const { name } = Astro.params;
 if (!name) {
-    return Astro.redirect("/networks");
+  return Astro.redirect("/networks");
 }
 
 const host = await Host.fromDockerSocket("http://localhost:2375");
 const network = host.networks.find((network) => network.name === name);
 if (!network) {
-    return Astro.redirect("/networks");
+  return Astro.redirect("/networks");
 }
 ---
 
-<Page title={[{ text: "Networks", href: "/networks" }, { text: name }]} icon={NetworkIcon}>
-    <section>
-        <h2>Debug</h2>
-        <details>
-            <summary>Network</summary>
-            <pre>{JSON.stringify(network, null, 2)}</pre>
-        </details>
-    </section>
+<Page
+  title={[{ text: "Networks", href: "/networks" }, { text: name }]}
+  icon={NetworkIcon}
+>
+  <section>
+    <h2>Debug</h2>
+    <details>
+      <summary>Network</summary>
+      <pre>{JSON.stringify(network, null, 2)}</pre>
+    </details>
+  </section>
 </Page>
 
 <style>
-    section {
-        margin-block: 3em;
-        & > h2 {
-            margin-bottom: 1em;
-        }
+  section {
+    margin-block: 3em;
+    & > h2 {
+      margin-bottom: 1em;
     }
+  }
 </style>

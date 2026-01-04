@@ -68,6 +68,10 @@ export class Project {
     return this.config?.path;
   }
 
+  get dockerComposeFileContent(): string | undefined {
+    return this.config?.content;
+  }
+
   get dockerCompose(): DockerComposeConfig | undefined {
     return this.config?.parsed;
   }

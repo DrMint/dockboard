@@ -1,58 +1,65 @@
 ---
 interface Props {
-    text: string;
-    color?: string;
-    fill?: boolean;
-    small?: boolean;
-    inline?: boolean;
-    tooltip?: string;
+  text: string;
+  color?: string;
+  fill?: boolean;
+  small?: boolean;
+  inline?: boolean;
+  tooltip?: string;
 }
 
-const { text, color = "var(--color-border-neutral)", fill = false, small = false, inline = false, tooltip } = Astro.props;
+const {
+  text,
+  color = "var(--color-border-neutral)",
+  fill = false,
+  small = false,
+  inline = false,
+  tooltip,
+} = Astro.props;
 ---
 
 <div
-    data-component="pill"
-    style={`--color: ${color};`}
-    title={tooltip}
-    data-fill={fill}
-    data-small={small}
-    data-inline={inline}
+  data-component="pill"
+  style={`--color: ${color};`}
+  title={tooltip}
+  data-fill={fill}
+  data-small={small}
+  data-inline={inline}
 >
-    <div class="text">{text}</div>
+  <div class="text">{text}</div>
 </div>
 
 <style>
-    [data-component="pill"] {
-        background-color: var(--color-surface-250);
-        border-radius: 9999px;
-        padding: 5px 10px;
-        font-size: 80%;
-        font-weight: 500;
-        color: var(--color-text-300);
-        width: fit-content;
-        border: 1px solid var(--color-surface-250);
+  [data-component="pill"] {
+    background-color: var(--color-surface-250);
+    border-radius: 9999px;
+    padding: 5px 10px;
+    font-size: 80%;
+    font-weight: 500;
+    color: var(--color-text-300);
+    width: fit-content;
+    border: 1px solid var(--color-surface-250);
 
-        &[data-inline="true"] {
-            display: inline-block;
-        }
-
-        &[data-small="true"] {
-            font-size: 70%;
-            padding: 3px 6px;
-        }
-
-        &[data-fill="false"] {
-            border-color: var(--color);
-        }
-
-        &[data-fill="true"] {
-            border-color: var(--color);
-            background-color: var(--color);
-        }
-
-        @media (prefers-color-scheme: light) {
-            border-width: 2px;
-        }
+    &[data-inline="true"] {
+      display: inline-block;
     }
+
+    &[data-small="true"] {
+      font-size: 70%;
+      padding: 3px 6px;
+    }
+
+    &[data-fill="false"] {
+      border-color: var(--color);
+    }
+
+    &[data-fill="true"] {
+      border-color: var(--color);
+      background-color: var(--color);
+    }
+
+    @media (prefers-color-scheme: light) {
+      border-width: 2px;
+    }
+  }
 </style>

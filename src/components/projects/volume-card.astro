@@ -1,0 +1,73 @@
+---
+import Card from "../card.astro";
+import type { Volume } from "@/models/volume";
+import Pill from "../pill.astro";
+import { formatUnixTimestamp } from "@/utils/formats";
+
+interface Props {
+  volume: Volume;
+}
+
+const { volume } = Astro.props;
+---
+
+<Card href={`/volumes/${volume.name}`}>
+  <div class="card-header">
+    <h3>{volume.name}</h3>
+    <Pill
+      text={volume.instance ? "Up" : "Down"}
+      color={volume.instance
+        ? "var(--color-border-success)"
+        : "var(--color-border-danger)"}
+    />
+  </div>
+  {
+    volume.createdOn && (
+      <div class="card-meta">
+        <p>Created at:</p>
+        <div>
+          <Pill
+            text={formatUnixTimestamp(volume.createdOn, true)}
+            color="var(--color-surface-300)"
+            fill
+            small
+          />
+        </div>
+      </div>
+    )
+  }
+</Card>
+
+<style>
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    & + * {
+      border-top: 1px solid var(--color-surface-300);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .card-meta > p {
+    font-size: 80%;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .card-meta > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+</style>

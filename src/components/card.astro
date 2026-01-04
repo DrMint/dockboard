@@ -33,23 +33,23 @@ const { href } = Astro.props;
     transition-timing-function: ease-in-out;
     transition-property: box-shadow, transform, border-color;
 
-    
-    &:hover, &:focus {
-        box-shadow: 0 3px 0 0 var(--color-surface-400);
-        border-color: var(--color-surface-400);
-        transform: translateY(-3px);
-        outline: none;
+    &:hover,
+    &:focus {
+      box-shadow: 0 3px 0 0 var(--color-surface-400);
+      border-color: var(--color-surface-400);
+      transform: translateY(-3px);
+      outline: none;
     }
 
     &:focus {
-        border-color: var(--color-primary);
-        box-shadow: 0 3px 0 0 var(--color-primary);
+      border-color: var(--color-primary);
+      box-shadow: 0 3px 0 0 var(--color-primary);
     }
 
     &:active {
-        box-shadow: none;
-        border-color: var(--color-surface-300);
-        transform: translateY(0);
+      box-shadow: none;
+      border-color: var(--color-surface-300);
+      transform: translateY(0);
     }
   }
 </style>

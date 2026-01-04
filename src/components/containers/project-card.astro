@@ -24,12 +24,25 @@ const { container, project } = Astro.props;
     }
   </div>
   <div class="card-meta">
-    This container is part of the <Pill text={project.name} color="var(--color-surface-300)" fill small inline /> project{
+    This container is part of the <Pill
+      text={project.name}
+      color="var(--color-surface-300)"
+      fill
+      small
+      inline
+    /> project{
       container.serviceName === container.name ? (
         ""
       ) : (
         <span>
-          under the service name <Pill text={container.serviceName} color="var(--color-surface-300)" fill small inline />
+          under the service name{" "}
+          <Pill
+            text={container.serviceName}
+            color="var(--color-surface-300)"
+            fill
+            small
+            inline
+          />
         </span>
       )
     }

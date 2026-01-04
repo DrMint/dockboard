@@ -66,7 +66,7 @@ export class Images<
        */
       manifests?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ImageSummary[], ErrorResponse>({
       path: `/images/json`,
@@ -132,7 +132,7 @@ export class Images<
        */
       platform?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/images/create`,
@@ -159,7 +159,7 @@ export class Images<
        */
       manifests?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ImageInspect, ErrorResponse>({
       path: `/images/${name}/json`,
@@ -193,7 +193,7 @@ export class Images<
        */
       platform?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<
       {
@@ -242,7 +242,7 @@ export class Images<
        */
       platforms?: string[];
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ImageDeleteResponseItem[], ErrorResponse>({
       path: `/images/${name}`,
@@ -273,7 +273,7 @@ export class Images<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<
       {
@@ -320,7 +320,7 @@ export class Images<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<
       {
@@ -361,7 +361,7 @@ export class Images<
        */
       platform?: string[];
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<File, ErrorResponse>({
       path: `/images/${name}/get`,
@@ -391,7 +391,7 @@ export class Images<
        */
       platform?: string[];
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<File, ErrorResponse>({
       path: `/images/get`,

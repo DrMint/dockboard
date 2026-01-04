@@ -2,37 +2,37 @@
 import CircleDashedIcon from "@/assets/icons/lucide--circle-dashed.svg";
 
 interface Props {
-    message: string;
+  message: string;
 }
 
 const { message } = Astro.props;
 ---
 
 <div data-component="empty-table">
-    <CircleDashedIcon />
-    <p>{message}</p>
+  <CircleDashedIcon />
+  <p>{message}</p>
 </div>
 
 <style>
-    [data-component="empty-table"] {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 20px;
-        border-radius: 10px;
+  [data-component="empty-table"] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 10px;
 
-        & > svg {
-            width: 40px;
-            height: 40px;
-        }
-
-        & > p {
-            font-size: 14px;
-            color: var(--color-text-400);
-        }
-
-        height: 20em;
+    & > svg {
+      width: 40px;
+      height: 40px;
     }
+
+    & > p {
+      font-size: 14px;
+      color: var(--color-text-400);
+    }
+
+    height: 20em;
+  }
 </style>

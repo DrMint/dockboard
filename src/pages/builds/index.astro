@@ -6,18 +6,18 @@ import EmptyTable from "@/components/empty-table.astro";
 ---
 
 <Page
-    title={[{ text: "Builds" }]}
-    icon={WrenchIcon}
-    description="Builds are the process of creating images from source code."
+  title={[{ text: "Builds" }]}
+  icon={WrenchIcon}
+  description="Builds are the process of creating images from source code."
 >
-    <Card>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                </tr>
-            </thead>
-        </table>
-        <EmptyTable message="No builds" />
-    </Card>
+  <Card>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+    </table>
+    <EmptyTable message="No builds" />
+  </Card>
 </Page>

@@ -45,7 +45,7 @@ export class Exec<
        */
       ConsoleSize?: number[] | null;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/exec/${id}/start`,
@@ -70,7 +70,7 @@ export class Exec<
       /** Width of the TTY session in characters */
       w: number;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/exec/${id}/resize`,

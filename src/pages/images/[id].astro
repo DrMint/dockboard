@@ -4,7 +4,6 @@ import HexagonIcon from "@/assets/icons/lucide--hexagon.svg";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
 import Button from "@/components/button.astro";
 import { Host } from "@/models/host";
-import ImageCard from "@/components/containers/image-card.astro";
 import ContainerCard from "@/components/projects/container-card.astro";
 
 const { id } = Astro.params;
@@ -75,7 +74,6 @@ if (!image) {
     }
   }
 </style>
-
 
 <script>
   import { actions } from "astro:actions";

@@ -11,181 +11,208 @@ const host = await Host.fromDockerSocket("http://localhost:2375");
 
 const info = new Info();
 const { data: systemInfo } = await info.systemInfo({
-    baseUrl: "http://localhost:2375",
+  baseUrl: "http://localhost:2375",
 });
 const version = new Version();
 const { data: versionData } = await version.systemVersion({
-    baseUrl: "http://localhost:2375",
+  baseUrl: "http://localhost:2375",
 });
 const system = new System() as any;
 const { data: systemData } = await system.systemDataUsage(
-    {},
-    {
-        baseUrl: "http://localhost:2375",
-    },
+  {},
+  {
+    baseUrl: "http://localhost:2375",
+  }
 );
 ---
 
 <Page title={[{ text: capitalize(host.name) }]} icon={ServerIcon}>
-    <div>
-        <h2>System</h2>
-        <ul>
-            <li>Name: {systemInfo!.Name}</li>
-            <li>Operating System: {systemInfo!.OperatingSystem}</li>
-            <li>Architecture: {systemInfo!.Architecture}</li>
-            <li>CPUs: {systemInfo!.NCPU}</li>
-            <li>Docker version: {versionData!.Version}</li>
+  <div>
+    <h2>System</h2>
+    <ul>
+      <li>Name: {systemInfo!.Name}</li>
+      <li>Operating System: {systemInfo!.OperatingSystem}</li>
+      <li>Architecture: {systemInfo!.Architecture}</li>
+      <li>CPUs: {systemInfo!.NCPU}</li>
+      <li>Docker version: {versionData!.Version}</li>
+      <li>
+        Docker Engine API version: {versionData!.ApiVersion} (minimum: {
+          versionData!.MinAPIVersion
+        })
+      </li>
+      <li>Kernel version: {versionData!.KernelVersion}</li>
+      <li>Total memory: {formatBytes(systemInfo!.MemTotal!)}</li>
+    </ul>
+  </div>
+  <div>
+    <h2>Containers</h2>
+    <ul>
+      <li>Running: {systemInfo!.ContainersRunning}</li>
+      <li>Paused: {systemInfo!.ContainersPaused}</li>
+      <li>Stopped: {systemInfo!.ContainersStopped}</li>
+    </ul>
+  </div>
+
+  <details>
+    <summary>View projects</summary>
+    {
+      host.projects.map((project) => (
+        <div>
+          <h3>{project.name}</h3>
+          <ul>
             <li>
-                Docker Engine API version: {versionData!.ApiVersion} (minimum: {
-                    versionData!.MinAPIVersion
-                })
+              Containers:{" "}
+              {project.containers.map((container) => container.name).join(", ")}
             </li>
-            <li>Kernel version: {versionData!.KernelVersion}</li>
-            <li>Total memory: {formatBytes(systemInfo!.MemTotal!)}</li>
-        </ul>
-    </div>
-    <div>
-        <h2>Containers</h2>
-        <ul>
-            <li>Running: {systemInfo!.ContainersRunning}</li>
-            <li>Paused: {systemInfo!.ContainersPaused}</li>
-            <li>Stopped: {systemInfo!.ContainersStopped}</li>
-        </ul>
-    </div>
+            <li>
+              Networks:{" "}
+              {project.networks.map((network) => network.name).join(", ")}
+            </li>
+            <li>
+              Volumes: {project.volumes.map((volume) => volume.name).join(", ")}
+            </li>
+          </ul>
+        </div>
+      ))
+    }
+  </details>
 
-    <details>
-        <summary>View projects</summary>
-        {host.projects.map((project) => (
-            <div>
-                <h3>{project.name}</h3>
-                <ul>
-                    <li>Containers: {project.containers.map((container) => container.name).join(", ")}</li>
-                    <li>Networks: {project.networks.map((network) => network.name).join(", ")}</li>
-                    <li>Volumes: {project.volumes.map((volume) => volume.name).join(", ")}</li>
-                </ul>
-            </div>
-        ))}
-    </details>
+  <details>
+    <summary>View containers</summary>
+    {
+      host.containers.map((container) => (
+        <div>
+          <h3>{container.name}</h3>
+          <ul>
+            <li>
+              Networks:{" "}
+              {container.networks.map((network) => network.name).join(", ")}
+            </li>
+            <li>Project: {container.project?.name ?? "-"}</li>
+            <li>
+              Image: {container.image?.name ?? "-"} ({container.imageName})
+            </li>
+          </ul>
+        </div>
+      ))
+    }
+  </details>
 
-    <details>
-        <summary>View containers</summary>
-        {host.containers.map((container) => (
-            <div>
-                <h3>{container.name}</h3>
-                <ul>
-                    <li>Networks: {container.networks.map((network) => network.name).join(", ")}</li>
-                    <li>Project: {container.project?.name ?? "-"}</li>
-                    <li>Image: {container.image?.name ?? "-"} ({container.imageName})</li>
-                </ul>
-            </div>
-        ))}
-    </details>
+  <details>
+    <summary>View networks</summary>
+    {
+      host.networks.map((network) => (
+        <div>
+          <h3>{network.name}</h3>
+          <ul>
+            <li>
+              Containers:{" "}
+              {network.containers.map((container) => container.name).join(", ")}
+            </li>
+            <li>Project: {network.project?.name ?? "-"}</li>
+          </ul>
+        </div>
+      ))
+    }
+  </details>
 
-    <details>
-        <summary>View networks</summary>
-        {host.networks.map((network) => (
-            <div>
-                <h3>{network.name}</h3>
-                <ul>
-                    <li>Containers: {network.containers.map((container) => container.name).join(", ")}</li>
-                    <li>Project: {network.project?.name ?? "-"}</li>
-                </ul>
-            </div>
-        ))}
-    </details>
+  <details>
+    <summary>View volumes</summary>
+    {
+      host.volumes.map((volume) => (
+        <div>
+          <h3>{volume.name}</h3>
+          <ul>
+            <li>Project: {volume.project?.name ?? "-"}</li>
+          </ul>
+        </div>
+      ))
+    }
+  </details>
 
-    <details>
-        <summary>View volumes</summary>
-        {host.volumes.map((volume) => (
-            <div>
-                <h3>{volume.name}</h3>
-                <ul>
-                    <li>Project: {volume.project?.name ?? "-"}</li>
-                </ul>
-            </div>
-        ))}
-    </details>
+  <details>
+    <summary>View images</summary>
+    {
+      host.images
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((image) => (
+          <div>
+            <h3>{image.name}</h3>
+            <ul>
+              <li>
+                Containers:{" "}
+                {image.containers.map((container) => container.name).join(", ")}
+              </li>
+            </ul>
+          </div>
+        ))
+    }
+  </details>
 
-    <details>
-        <summary>View images</summary>
-        {host.images.sort((a, b) => a.name.localeCompare(b.name)).map((image) => (
-            <div>
-                <h3>{image.name}</h3>
-                <ul>
-                    <li>Containers: {image.containers.map((container) => container.name).join(", ")}</li>
-                </ul>
-            </div>
-        ))}
-    </details>
-
-    <details>
-        <summary>View system information</summary>
-        <pre>{JSON.stringify(systemInfo, null, 2)}</pre>
-    </details>
-    <details>
-        <summary>View version information</summary>
-        <pre>{JSON.stringify(versionData, null, 2)}</pre>
-    </details>
-    <div>
-        <h2>System data usage</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Count</th>
-                    <th>Total</th>
-                    <th>Reclaimable</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Images</td>
-                    <td
-                        >{systemData.ImageUsage.TotalCount} ({
-                            systemData.ImageUsage.ActiveCount
-                        } active)</td
-                    >
-                    <td>{formatBytes(systemData.ImageUsage.TotalSize)}</td>
-                    <td>{formatBytes(systemData.ImageUsage.Reclaimable)}</td>
-                </tr>
-                <tr>
-                    <td>Containers</td>
-                    <td
-                        >{systemData.ContainerUsage.TotalCount} ({
-                            systemData.ContainerUsage.ActiveCount
-                        } active)</td
-                    >
-                    <td>{formatBytes(systemData.ContainerUsage.TotalSize)}</td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>Volumes</td>
-                    <td>{systemData.VolumeUsage.TotalCount}</td>
-                    <td>{formatBytes(systemData.VolumeUsage.TotalSize)}</td>
-                    <td>{formatBytes(systemData.VolumeUsage.Reclaimable)}</td>
-                </tr>
-                <tr>
-                    <td>Build cache</td>
-                    <td>{systemData.BuildCacheUsage.TotalCount}</td>
-                    <td>{formatBytes(systemData.BuildCacheUsage.TotalSize)}</td>
-                    <td
-                        >{
-                            formatBytes(systemData.BuildCacheUsage.Reclaimable)
-                        }</td
-                    >
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <details>
-        <summary>View system data usage</summary>
-        <pre>{JSON.stringify(systemData, null, 2)}</pre>
-    </details>
+  <details>
+    <summary>View system information</summary>
+    <pre>{JSON.stringify(systemInfo, null, 2)}</pre>
+  </details>
+  <details>
+    <summary>View version information</summary>
+    <pre>{JSON.stringify(versionData, null, 2)}</pre>
+  </details>
+  <div>
+    <h2>System data usage</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Count</th>
+          <th>Total</th>
+          <th>Reclaimable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Images</td>
+          <td
+            >{systemData.ImageUsage.TotalCount} ({
+              systemData.ImageUsage.ActiveCount
+            } active)</td
+          >
+          <td>{formatBytes(systemData.ImageUsage.TotalSize)}</td>
+          <td>{formatBytes(systemData.ImageUsage.Reclaimable)}</td>
+        </tr>
+        <tr>
+          <td>Containers</td>
+          <td
+            >{systemData.ContainerUsage.TotalCount} ({
+              systemData.ContainerUsage.ActiveCount
+            } active)</td
+          >
+          <td>{formatBytes(systemData.ContainerUsage.TotalSize)}</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Volumes</td>
+          <td>{systemData.VolumeUsage.TotalCount}</td>
+          <td>{formatBytes(systemData.VolumeUsage.TotalSize)}</td>
+          <td>{formatBytes(systemData.VolumeUsage.Reclaimable)}</td>
+        </tr>
+        <tr>
+          <td>Build cache</td>
+          <td>{systemData.BuildCacheUsage.TotalCount}</td>
+          <td>{formatBytes(systemData.BuildCacheUsage.TotalSize)}</td>
+          <td>{formatBytes(systemData.BuildCacheUsage.Reclaimable)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <details>
+    <summary>View system data usage</summary>
+    <pre>{JSON.stringify(systemData, null, 2)}</pre>
+  </details>
 </Page>
 
 <style>
-    h2 {
-        margin-top: 3em;
-        margin-bottom: 1em;
-    }
+  h2 {
+    margin-top: 3em;
+    margin-bottom: 1em;
+  }
 </style>

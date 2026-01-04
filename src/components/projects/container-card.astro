@@ -41,7 +41,12 @@ const getContainerStateColor = (state: Container["state"]) => {
         <p>Networks:</p>
         <div>
           {container.networks.map((network) => (
-            <Pill text={network.name} color="var(--color-surface-300)" fill small />
+            <Pill
+              text={network.name}
+              color="var(--color-surface-300)"
+              fill
+              small
+            />
           ))}
         </div>
       </div>

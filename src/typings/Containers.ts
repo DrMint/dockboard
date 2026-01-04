@@ -70,7 +70,7 @@ export class Containers<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ContainerSummary[], ErrorResponse>({
       path: `/containers/json`,
@@ -127,7 +127,7 @@ export class Containers<
        */
       platform?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ContainerCreateResponse, ErrorResponse>({
       path: `/containers/create`,
@@ -155,7 +155,7 @@ export class Containers<
        */
       size?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ContainerInspectResponse, ErrorResponse>({
       path: `/containers/${id}/json`,
@@ -181,7 +181,7 @@ export class Containers<
        */
       ps_args?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ContainerTopResponse, ErrorResponse>({
       path: `/containers/${id}/top`,
@@ -238,7 +238,7 @@ export class Containers<
        */
       tail?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<File, ErrorResponse>({
       path: `/containers/${id}/logs`,
@@ -299,7 +299,7 @@ export class Containers<
        */
       "one-shot"?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ContainerStatsResponse, ErrorResponse>({
       path: `/containers/${id}/stats`,
@@ -324,7 +324,7 @@ export class Containers<
       /** Width of the TTY session in characters */
       w: number;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/containers/${id}/resize`,
@@ -350,7 +350,7 @@ export class Containers<
        */
       detachKeys?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, void | ErrorResponse>({
       path: `/containers/${id}/start`,
@@ -374,7 +374,7 @@ export class Containers<
       /** Number of seconds to wait before killing the container */
       t?: number;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, void | ErrorResponse>({
       path: `/containers/${id}/stop`,
@@ -398,7 +398,7 @@ export class Containers<
       /** Number of seconds to wait before killing the container */
       t?: number;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/containers/${id}/restart`,
@@ -423,7 +423,7 @@ export class Containers<
        */
       signal?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/containers/${id}/kill`,
@@ -451,7 +451,7 @@ export class Containers<
        */
       RestartPolicy?: RestartPolicy;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ContainerUpdateResponse, ErrorResponse>({
       path: `/containers/${id}/update`,
@@ -475,7 +475,7 @@ export class Containers<
       /** New name for the container */
       name: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/containers/${id}/rename`,
@@ -561,7 +561,7 @@ export class Containers<
        */
       stderr?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, void | ErrorResponse>({
       path: `/containers/${id}/attach`,
@@ -612,7 +612,7 @@ export class Containers<
        */
       stderr?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, void | ErrorResponse>({
       path: `/containers/${id}/attach/ws`,
@@ -639,7 +639,7 @@ export class Containers<
        */
       condition?: "not-running" | "next-exit" | "removed";
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<ContainerWaitResponse, ErrorResponse>({
       path: `/containers/${id}/wait`,
@@ -675,7 +675,7 @@ export class Containers<
        */
       link?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/containers/${id}`,
@@ -697,7 +697,7 @@ export class Containers<
       /** Resource in the container’s filesystem to archive. */
       path: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/containers/${id}/archive`,
@@ -719,7 +719,7 @@ export class Containers<
       /** Resource in the container’s filesystem to archive. */
       path: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/containers/${id}/archive`,
@@ -753,7 +753,7 @@ export class Containers<
       copyUIDGID?: string;
     },
     inputStream: File,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/containers/${id}/archive`,
@@ -781,7 +781,7 @@ export class Containers<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<
       {
@@ -851,7 +851,7 @@ export class Containers<
       /** The working directory for the exec process inside the container. */
       WorkingDir?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<IDResponse, ErrorResponse>({
       path: `/containers/${id}/exec`,

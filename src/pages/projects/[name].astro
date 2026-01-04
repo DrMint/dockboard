@@ -6,13 +6,9 @@ import PlayIcon from "@/assets/icons/lucide--play.svg";
 import CircleDivideIcon from "@/assets/icons/lucide--circle-divide.svg";
 import DownloadIcon from "@/assets/icons/lucide--download.svg";
 import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
-import Card from "@/components/card.astro";
-import Pill from "@/components/pill.astro";
-import TriangleAlertIcon from "@/assets/icons/lucide--triangle-alert.svg";
-import CircleAlertIcon from "@/assets/icons/lucide--circle-alert.svg";
-import CircleQuestionMarkIcon from "@/assets/icons/lucide--circle-question-mark.svg";
 import ContainerCard from "@/components/projects/container-card.astro";
 import NetworkCard from "@/components/projects/network-card.astro";
+import VolumeCard from "@/components/projects/volume-card.astro";
 import { Host } from "@/models/host";
 
 const { name } = Astro.params;
@@ -92,49 +88,12 @@ if (!project) {
         <h2>Volumes</h2>
         <div class="grid">
           {project.volumes.map((volume) => (
-            <Card
-              href={volume.instance ? `/volumes/${volume.name}` : undefined}
-            >
-              <div class="card-header">
-                <h3>{volume.name}</h3>
-
-                <Pill
-                  text={volume.instance ? "Up" : "Down"}
-                  color={
-                    volume.instance
-                      ? "var(--color-border-success)"
-                      : "var(--color-border-danger)"
-                  }
-                />
-              </div>
-            </Card>
+            <VolumeCard volume={volume} />
           ))}
         </div>
       </section>
     )
   }
-
-  <!-- {
-    lintResults.length > 0 && (
-      <section>
-        <h2>Lint</h2>
-        <ul class="lint-results">
-          {lintResults.map((result) => (
-            <li data-level={result.level}>
-              {result.level === "error" ? (
-                <TriangleAlertIcon />
-              ) : result.level === "warning" ? (
-                <CircleAlertIcon />
-              ) : (
-                <CircleQuestionMarkIcon />
-              )}{" "}
-              {result.message}
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  } -->
 
   <section>
     <h2>Debug</h2>
@@ -145,7 +104,7 @@ if (!project) {
       </details>
       <details>
         <summary>Parsed config</summary>
-        <pre>{JSON.stringify(project.config, null, 2)}</pre>
+        <pre>{JSON.stringify(project.dockerCompose, null, 2)}</pre>
       </details>
       <details>
         <summary>Containers</summary>

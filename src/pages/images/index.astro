@@ -10,7 +10,9 @@ import { Host } from "@/models/host";
 import { formatBytes, formatUnixTimestamp } from "@/utils/formats";
 
 const host = await Host.fromDockerSocket("http://localhost:2375");
-const images = host.images.toSorted((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0));
+const images = host.images.toSorted(
+  (a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)
+);
 ---
 
 <Page
@@ -55,7 +57,9 @@ const images = host.images.toSorted((a, b) => (b.createdAt?.getTime() ?? 0) - (a
                   }
                 />
               </td>
-              <td>{image.createdAt ? formatUnixTimestamp(image.createdAt) : "-"}</td>
+              <td>
+                {image.createdAt ? formatUnixTimestamp(image.createdAt) : "-"}
+              </td>
               <td>{formatBytes(image.size)}</td>
             </tr>
           ))

@@ -18,7 +18,9 @@ export class Volume {
   }
 
   get createdOn(): Date | undefined {
-    return this.instance?.CreatedAt ? new Date(this.instance.CreatedAt) : undefined;
+    return this.instance?.CreatedAt
+      ? new Date(this.instance.CreatedAt)
+      : undefined;
   }
 
   static async getAll(projects: Project[]): Promise<Volume[]> {

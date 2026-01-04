@@ -61,7 +61,7 @@ export class Image {
 
     const composeImageNames = projects.flatMap((project) => {
       return Object.entries(project.dockerCompose?.services ?? {}).flatMap(
-        ([name, config]) =>
+        ([_, config]) =>
           config.image ? [this.normalizeComposeImage(config.image)] : []
       );
     });

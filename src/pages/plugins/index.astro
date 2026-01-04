@@ -7,37 +7,35 @@ import EmptyTable from "@/components/empty-table.astro";
 
 const plugins = new Plugins();
 const { data: pluginsData } = await plugins.pluginList(
-    {},
-    {
-        baseUrl: "http://localhost:2375",
-    },
+  {},
+  {
+    baseUrl: "http://localhost:2375",
+  }
 );
 ---
 
 <Page title={[{ text: "Plugins" }]} icon={PlugIcon}>
-    <Card>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Enabled</th>
-                </tr>
-            </thead>
-            <tbody>
-                {
-                    pluginsData.map((plugin) => (
-                        <tr>
-                            <td>
-                                <a href={`/plugins/${plugin.Name}`}>
-                                    {plugin.Name}
-                                </a>
-                            </td>
-                            <td>{plugin.Enabled ? "Yes" : "No"}</td>
-                        </tr>
-                    ))
-                }
-            </tbody>
-        </table>
-        {pluginsData.length === 0 && <EmptyTable message="No plugins" />}
-    </Card>
+  <Card>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Enabled</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          pluginsData.map((plugin) => (
+            <tr>
+              <td>
+                <a href={`/plugins/${plugin.Name}`}>{plugin.Name}</a>
+              </td>
+              <td>{plugin.Enabled ? "Yes" : "No"}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    {pluginsData.length === 0 && <EmptyTable message="No plugins" />}
+  </Card>
 </Page>

@@ -54,7 +54,7 @@ export class Networks<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<NetworkSummary[], ErrorResponse>({
       path: `/networks`,
@@ -82,7 +82,7 @@ export class Networks<
       /** Filter the network by scope (swarm, global, or local) */
       scope?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<NetworkInspect, ErrorResponse>({
       path: `/networks/${id}`,
@@ -183,7 +183,7 @@ export class Networks<
        */
       Labels?: Record<string, string>;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<NetworkCreateResponse, ErrorResponse>({
       path: `/networks/create`,
@@ -204,7 +204,7 @@ export class Networks<
   networkConnect = (
     id: string,
     container: NetworkConnectRequest,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/networks/${id}/connect`,
@@ -224,7 +224,7 @@ export class Networks<
   networkDisconnect = (
     id: string,
     container: NetworkDisconnectRequest,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/networks/${id}/disconnect`,
@@ -252,7 +252,7 @@ export class Networks<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<
       {

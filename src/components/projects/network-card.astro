@@ -15,7 +15,13 @@ const MAX_CONTAINERS_TO_SHOW = 4;
 
 <Card href={`/networks/${network.name}`}>
   <div class="card-header">
-    {network.isExternal && <div title="External network"><LogInIcon /></div>}
+    {
+      network.isExternal && (
+        <div title="External network">
+          <LogInIcon />
+        </div>
+      )
+    }
     <h3>{network.name}</h3>
     {
       network.isRunning ? (

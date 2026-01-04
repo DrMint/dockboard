@@ -48,7 +48,7 @@ export class Volumes<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<VolumeListResponse, ErrorResponse>({
       path: `/volumes`,
@@ -67,7 +67,7 @@ export class Volumes<
    */
   volumeCreate = (
     volumeConfig: VolumeCreateRequest,
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<Volume, ErrorResponse>({
       path: `/volumes/create`,
@@ -109,7 +109,7 @@ export class Volumes<
        */
       force?: boolean;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<void, ErrorResponse>({
       path: `/volumes/${name}`,
@@ -136,7 +136,7 @@ export class Volumes<
        */
       filters?: string;
     },
-    params: RequestParams = {},
+    params: RequestParams = {}
   ) =>
     this.request<
       {
