@@ -1,90 +1,76 @@
 ---
 import Page from "@/components/page.astro";
-import { Images } from "@/typings/Images";
-import { formatBytes, formatUnixTimestamp } from "@/utils/formats";
-import type { ImageSummary } from "@/typings/data-contracts";
 import HexagonIcon from "@/assets/icons/lucide--hexagon.svg";
 import Pill from "@/components/pill.astro";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
 import Button from "@/components/button.astro";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
+import { Host } from "@/models/host";
+import { formatBytes, formatUnixTimestamp } from "@/utils/formats";
 
-const imagesApi = new Images();
-const { data: imagesData } = await imagesApi.imageList(
-    {},
-    { baseUrl: "http://localhost:2375" },
-);
-
-const getName = (image: ImageSummary) => {
-    return image.RepoTags[0] || image.RepoDigests[0]?.split("@")[0] || image.Id;
-};
-
-const images = imagesData.sort((a, b) => b.Created - a.Created);
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const images = host.images.toSorted((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0));
 ---
 
 <Page
-    title={[{ text: "Images" }]}
-    icon={HexagonIcon}
-    description="Images are the read-only templates used to create containers. They can be inspected, deleted, and pulled from registries."
+  title={[{ text: "Images" }]}
+  icon={HexagonIcon}
+  description="Images are the read-only templates used to create containers. They can be inspected, deleted, and pulled from registries."
 >
-    <div slot="header">
-        <Button
-            icon={Trash2Icon}
-            label="Prune"
-            data-action="images.prune"
-            theme="danger"
-        />
-    </div>
-    <Card>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Size</th>
-                </tr>
-            </thead>
-            <tbody>
-                {
-                    images.map((image) => (
-                        <tr>
-                            <td>
-                                <a href={`/images/${image.Id}`}>
-                                    {getName(image)}
-                                </a>
-                            </td>
-                            <td>
-                                <Pill
-                                    text={
-                                        image.Containers > 0
-                                            ? "In use"
-                                            : "Unused"
-                                    }
-                                    color={
-                                        image.Containers > 0
-                                            ? "var(--color-border-neutral)"
-                                            : "var(--color-border-danger)"
-                                    }
-                                />
-                            </td>
-                            <td>{formatUnixTimestamp(image.Created)}</td>
-                            <td>{formatBytes(image.Size)}</td>
-                        </tr>
-                    ))
-                }
-            </tbody>
-        </table>
-        {images.length === 0 && <EmptyTable message="No images" />}
-    </Card>
+  <div slot="header">
+    <Button
+      icon={Trash2Icon}
+      label="Prune"
+      data-action="images.prune"
+      theme="danger"
+    />
+  </div>
+  <Card>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Size</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          images.map((image) => (
+            <tr>
+              <td>
+                <a href={`/images/${encodeURIComponent(image.id)}`}>
+                  {image.name}
+                </a>
+              </td>
+              <td>
+                <Pill
+                  text={image.containers.length > 0 ? "In use" : "Unused"}
+                  color={
+                    image.containers.length > 0
+                      ? "var(--color-border-neutral)"
+                      : "var(--color-border-danger)"
+                  }
+                />
+              </td>
+              <td>{image.createdAt ? formatUnixTimestamp(image.createdAt) : "-"}</td>
+              <td>{formatBytes(image.size)}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    {images.length === 0 && <EmptyTable message="No images" />}
+  </Card>
 </Page>
 
 <script>
-    import { actions } from "astro:actions";
-    const button = document.querySelector("button[data-action='images.prune']");
-    button?.addEventListener("click", async () => {
-        await actions.images.prune();
-        window.location.reload();
-    });
+  import { actions } from "astro:actions";
+  const button = document.querySelector("button[data-action='images.prune']");
+  button?.addEventListener("click", async () => {
+    await actions.images.prune();
+    window.location.reload();
+  });
 </script>

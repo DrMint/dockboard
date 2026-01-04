@@ -5,8 +5,10 @@ import Toggle from "@/components/toggle.astro";
 import Card from "@/components/card.astro";
 import { Project } from "@/models/project";
 import Tag from "@/components/tag.astro";
+import { Host } from "@/models/host";
 
-const projects = await Project.getAllProjects();
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const projects = host.projects;
 projects.sort((a, b) => a.name.localeCompare(b.name));
 ---
 

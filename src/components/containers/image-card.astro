@@ -1,0 +1,126 @@
+---
+import Card from "../card.astro";
+import type { Image } from "@/models/image";
+import Pill from "../pill.astro";
+import { formatBytes, formatUnixTimestamp } from "@/utils/formats";
+
+interface Props {
+  image: Image;
+}
+
+const { image } = Astro.props;
+---
+
+<Card href={`/images/${image.id}`}>
+  <div class="card-header">
+    <h3>{image.name}</h3>
+    {
+      image.isPulled ? (
+        <Pill text="Available" color={"var(--color-border-success)"} />
+      ) : (
+        <Pill text="Pending" color="var(--color-border-danger)" />
+      )
+    }
+  </div>
+  <div class="card-meta">
+    <p>Tags:</p>
+    <div>
+      {
+        image.tags.length > 0 ? (
+          image.tags.map((tag) => (
+            <Pill text={tag} color="var(--color-surface-300)" fill small />
+          ))
+        ) : (
+          <Pill text="untagged" color="var(--color-surface-300)" fill small />
+        )
+      }
+    </div>
+  </div>
+  {
+    image.createdAt && (
+      <div class="card-meta">
+        <p>Created at:</p>
+        <div>
+          <Pill
+            text={formatUnixTimestamp(image.createdAt, true)}
+            color="var(--color-surface-300)"
+            fill
+            small
+          />
+        </div>
+      </div>
+    )
+  }
+  {
+    image.exposedPorts.length > 0 && (
+      <div class="card-meta">
+        <p>Exposed ports:</p>
+        <div>
+          {image.exposedPorts.map((port) => (
+            <Pill text={port} color="var(--color-surface-300)" fill small />
+          ))}
+        </div>
+      </div>
+    )
+  }
+  <div class="card-meta">
+    <p>Size:</p>
+    <div>
+      <Pill
+        text={formatBytes(image.size)}
+        color="var(--color-surface-300)"
+        fill
+        small
+      />
+    </div>
+  </div>
+</Card>
+
+<style>
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    & svg {
+      width: 16px;
+      height: 16px;
+      translate: 0 2px;
+      margin-right: 4px;
+    }
+
+    & h3 {
+      line-height: 1.3;
+    }
+
+    & + * {
+      border-top: 1px solid var(--color-surface-300);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+
+    & + * {
+      margin-top: 12px;
+    }
+
+    & > p {
+      font-size: 80%;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    & > div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+</style>

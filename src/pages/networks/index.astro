@@ -1,117 +1,83 @@
 ---
 import Page from "@/components/page.astro";
-import { Networks } from "@/typings/Networks";
 import NetworkIcon from "@/assets/icons/lucide--network.svg";
 import { formatUnixTimestamp } from "@/utils/formats";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
-import { Containers } from "@/typings/Containers";
 import Pill from "@/components/pill.astro";
 import Button from "@/components/button.astro";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
+import { Host } from "@/models/host";
 
-const networksApi = new Networks();
-const { data: networksData } = await networksApi.networkList(
-    {},
-    { baseUrl: "http://localhost:2375" },
-);
-
-const containerApi = new Containers();
-const { data: containersData } = await containerApi.containerList(
-    { all: true },
-    { baseUrl: "http://localhost:2375" },
-);
-
-const networks = networksData
-    .map((network) => {
-        return {
-            ...network,
-            containers: containersData.filter(
-                (container) =>
-                    network.Name in container.NetworkSettings?.Networks!,
-            ),
-        };
-    })
-    .sort(
-        (a, b) =>
-            new Date(b.Created!).getTime() - new Date(a.Created!).getTime(),
-    );
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const networks = host.networks.toSorted((a, b) => (b.createdOn?.getTime() ?? 0) - (a.createdOn?.getTime() ?? 0));
 ---
 
 <Page
-    title={[{ text: "Networks" }]}
-    icon={NetworkIcon}
-    description="Networks are the virtual networks that containers can connect to. They can be inspected, deleted, and created."
+  title={[{ text: "Networks" }]}
+  icon={NetworkIcon}
+  description="Networks are the virtual networks that containers can connect to. They can be inspected, deleted, and created."
 >
-    <div slot="header">
-        <Button
-            icon={Trash2Icon}
-            label="Prune"
-            data-action="networks.prune"
-            theme="danger"
-        />
-    </div>
-    <Card>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Project</th>
-                </tr>
-            </thead>
-            <tbody>
-                {
-                    networks.map((network) => (
-                        <tr>
-                            <td>
-                                <a href={`/networks/${network.Name}`}>
-                                    {network.Name}
-                                </a>
-                            </td>
-                            <td>
-                                <Pill
-                                    text={
-                                        network.containers.length > 0
-                                            ? "In use"
-                                            : "Unused"
-                                    }
-                                    color={
-                                        network.containers.length > 0
-                                            ? "var(--color-border-neutral)"
-                                            : "var(--color-border-danger)"
-                                    }
-                                />
-                            </td>
-                            <td>{formatUnixTimestamp(network.Created!)}</td>
-                            <td>
-                                <a
-                                    href={`/projects/${network.Labels!["com.docker.compose.project"]}`}
-                                >
-                                    {
-                                        network.Labels![
-                                            "com.docker.compose.project"
-                                        ]
-                                    }
-                                </a>
-                            </td>
-                        </tr>
-                    ))
-                }
-            </tbody>
-        </table>
-        {networks.length === 0 && <EmptyTable message="No networks" />}
-    </Card>
+  <div slot="header">
+    <Button
+      icon={Trash2Icon}
+      label="Prune"
+      data-action="networks.prune"
+      theme="danger"
+    />
+  </div>
+  <Card>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Project</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          networks.map((network) => (
+            <tr>
+              <td>
+                <a href={`/networks/${network.name}`}>{network.name}</a>
+              </td>
+              <td>
+                <Pill
+                  text={network.isRunning ? network.containers.length > 0 ? "In use" : "Unused" : "Down"}
+                  tooltip={network.containers.length > 0 ? network.containers.map((container) => container.name).join("\n") : undefined}
+                  color={
+                    network.isRunning && network.containers.length > 0
+                      ? "var(--color-border-neutral)"
+                      : "var(--color-border-danger)"
+                  }
+                />
+              </td>
+              <td>{ network.createdOn ? formatUnixTimestamp(network.createdOn) : "-" }</td>
+              <td>
+                {network.project ? (
+                  <a
+                    href={`/projects/${network.project.name}`}
+                  >
+                    {network.project.name}
+                  </a>
+                ) : "-"}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    {networks.length === 0 && <EmptyTable message="No networks" />}
+  </Card>
 </Page>
 
 <script>
-    import { actions } from "astro:actions";
-    const button = document.querySelector(
-        "button[data-action='networks.prune']",
-    );
-    button?.addEventListener("click", async () => {
-        await actions.networks.prune();
-        window.location.reload();
-    });
+  import { actions } from "astro:actions";
+  const button = document.querySelector("button[data-action='networks.prune']");
+  button?.addEventListener("click", async () => {
+    await actions.networks.prune();
+    window.location.reload();
+  });
 </script>

@@ -1,88 +1,66 @@
 ---
 import Page from "@/components/page.astro";
-import { Volumes } from "@/typings/Volumes";
 import HardDriveIcon from "@/assets/icons/lucide--hard-drive.svg";
 import { formatLongName, formatUnixTimestamp } from "@/utils/formats";
-import Pill from "@/components/pill.astro";
 import Button from "@/components/button.astro";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
+import { Host } from "@/models/host";
 
-const volumesApi = new Volumes();
-const { data: volumesData } = await volumesApi.volumeList(
-    {},
-    { baseUrl: "http://localhost:2375" },
-);
-
-const volumes = volumesData.Volumes!.sort(
-    (a, b) =>
-        new Date(b.CreatedAt!).getTime() - new Date(a.CreatedAt!).getTime(),
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const volumes = host.volumes.toSorted(
+  (a, b) => (b.createdOn?.getTime() ?? 0) - (a.createdOn?.getTime() ?? 0)
 );
 ---
 
 <Page
-    title={[{ text: "Volumes" }]}
-    icon={HardDriveIcon}
-    description="Volumes are the persistent storage that containers can use. They can be inspected, deleted, and created."
+  title={[{ text: "Volumes" }]}
+  icon={HardDriveIcon}
+  description="Volumes are the persistent storage that containers can use. They can be inspected, deleted, and created."
 >
-    <div slot="header">
-        <Button
-            icon={Trash2Icon}
-            label="Prune"
-            data-action="volumes.prune"
-            theme="danger"
-        />
-    </div>
-    <Card>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Created</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {
-                    volumes.map((volume) => (
-                        <tr>
-                            <td>
-                                <a href={`/volumes/${volume.Name}`}>
-                                    {formatLongName(volume.Name)}
-                                </a>
-                            </td>
-                            <td>{formatUnixTimestamp(volume.CreatedAt!)}</td>
-                            <td>
-                                <Pill
-                                    text={
-                                        volume.UsageData?.RefCount! > 0
-                                            ? "In use"
-                                            : "Unused"
-                                    }
-                                    color={
-                                        volume.UsageData?.RefCount! > 0
-                                            ? "var(--color-border-neutral)"
-                                            : "var(--color-border-danger)"
-                                    }
-                                />
-                            </td>
-                        </tr>
-                    ))
-                }
-            </tbody>
-        </table>
-        {volumes.length === 0 && <EmptyTable message="No volumes" />}
-    </Card>
+  <div slot="header">
+    <Button
+      icon={Trash2Icon}
+      label="Prune"
+      data-action="volumes.prune"
+      theme="danger"
+    />
+  </div>
+  <Card>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          volumes.map((volume) => (
+            <tr>
+              <td>
+                <a href={`/volumes/${volume.name}`}>
+                  {formatLongName(volume.name)}
+                </a>
+              </td>
+              <td>
+                {volume.createdOn ? formatUnixTimestamp(volume.createdOn) : "-"}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    {volumes.length === 0 && <EmptyTable message="No volumes" />}
+  </Card>
 </Page>
 
 <script>
-    import { actions } from "astro:actions";
-    const button = document.querySelector(
-        "button[data-action='volumes.prune']",
-    );
-    button?.addEventListener("click", async () => {
-        await actions.volumes.prune();
-        window.location.reload();
-    });
+  import { actions } from "astro:actions";
+  const button = document.querySelector("button[data-action='volumes.prune']");
+  button?.addEventListener("click", async () => {
+    await actions.volumes.prune();
+    window.location.reload();
+  });
 </script>

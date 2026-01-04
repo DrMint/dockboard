@@ -13,7 +13,7 @@ const { network } = Astro.props;
 const MAX_CONTAINERS_TO_SHOW = 4;
 ---
 
-<Card href={network.isRunning ? `/networks/${network.name}` : undefined}>
+<Card href={`/networks/${network.name}`}>
   <div class="card-header">
     {network.isExternal && <div title="External network"><LogInIcon /></div>}
     <h3>{network.name}</h3>
@@ -34,7 +34,7 @@ const MAX_CONTAINERS_TO_SHOW = 4;
             .slice(0, MAX_CONTAINERS_TO_SHOW)
             .map((container) => (
               <Pill
-                text={container}
+                text={container.name}
                 color="var(--color-surface-300)"
                 fill
                 small

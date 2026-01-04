@@ -27,7 +27,7 @@ const getContainerStateColor = (state: Container["state"]) => {
 };
 ---
 
-<Card href={container.isInstanciated ? `/containers/${container.name}` : undefined}>
+<Card href={`/containers/${container.name}`}>
   <div class="card-header">
     <h3>{container.name}</h3>
     <Pill
@@ -41,7 +41,7 @@ const getContainerStateColor = (state: Container["state"]) => {
         <p>Networks:</p>
         <div>
           {container.networks.map((network) => (
-            <Pill text={network} color="var(--color-surface-300)" fill small />
+            <Pill text={network.name} color="var(--color-surface-300)" fill small />
           ))}
         </div>
       </div>

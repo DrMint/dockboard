@@ -6,7 +6,6 @@ import PlayIcon from "@/assets/icons/lucide--play.svg";
 import CircleDivideIcon from "@/assets/icons/lucide--circle-divide.svg";
 import DownloadIcon from "@/assets/icons/lucide--download.svg";
 import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
-import { Project } from "@/models/project";
 import Card from "@/components/card.astro";
 import Pill from "@/components/pill.astro";
 import TriangleAlertIcon from "@/assets/icons/lucide--triangle-alert.svg";
@@ -14,14 +13,18 @@ import CircleAlertIcon from "@/assets/icons/lucide--circle-alert.svg";
 import CircleQuestionMarkIcon from "@/assets/icons/lucide--circle-question-mark.svg";
 import ContainerCard from "@/components/projects/container-card.astro";
 import NetworkCard from "@/components/projects/network-card.astro";
+import { Host } from "@/models/host";
 
 const { name } = Astro.params;
 if (!name) {
   return Astro.redirect("/projects");
 }
 
-const project = await Project.fromName(name);
-const lintResults = project.configLinter();
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const project = host.projects.find((project) => project.name === name);
+if (!project) {
+  return Astro.redirect("/projects");
+}
 ---
 
 <Page
@@ -111,7 +114,7 @@ const lintResults = project.configLinter();
     )
   }
 
-  {
+  <!-- {
     lintResults.length > 0 && (
       <section>
         <h2>Lint</h2>
@@ -131,7 +134,7 @@ const lintResults = project.configLinter();
         </ul>
       </section>
     )
-  }
+  } -->
 
   <section>
     <h2>Debug</h2>
@@ -156,20 +159,6 @@ const lintResults = project.configLinter();
         <summary>Volumes</summary>
         <pre>{JSON.stringify(project.volumes, null, 2)}</pre>
       </details>
-      {
-        lintResults.length > 0 && (
-          <details>
-            <summary>Config linter</summary>
-            <div class="config-linter">
-              {project.configLinter().map((result) => (
-                <div data-level={result.level}>
-                  <span>{result.message}</span>
-                </div>
-              ))}
-            </div>
-          </details>
-        )
-      }
     </div>
   </section>
 

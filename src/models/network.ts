@@ -1,59 +1,113 @@
 import type { NetworkSummary } from "@/typings/data-contracts";
 import type { DockerComposeConfig } from "./docker-compose-schema";
-import type { RunningResources } from "./project";
+import { Networks as NetworksApi } from "@/typings/Networks";
+import type { Project } from "./project";
+import { Container } from "./container";
 
 export class Network {
+  private readonly _containers: Set<Container> = new Set();
+
   constructor(
     public readonly name: string,
-    private readonly project: {
-      name: string;
-      config: DockerComposeConfig | null;
-      runningResources: RunningResources;
+    private readonly dockerCompose?: {
+      project: Project;
+      config: NonNullable<DockerComposeConfig["networks"]>[string];
     },
-    private readonly config?: NonNullable<
-      DockerComposeConfig["networks"]
-    >[string],
     private readonly instance?: NetworkSummary
   ) {}
 
-  get containers(): string[] {
-    const containersFromConfig = this.containersFromConfig;
-    const runningContainers = this.project.runningResources.containers
-      .filter((container) => container.NetworkSettings?.Networks?.[this.name])
-      .map((container) => container.Names![0].slice(1));
+  get project(): Project | undefined {
+    return this.dockerCompose?.project;
+  }
 
-    const uniqueContainers = new Set([
-      ...containersFromConfig,
-      ...runningContainers,
-    ]);
-
-    return Array.from(uniqueContainers);
+  get containers(): Container[] {
+    return Array.from(this._containers);
   }
 
   get isExternal(): boolean {
-    return this.config?.external === true;
+    return this.dockerCompose?.config.external === true;
   }
 
   get isRunning(): boolean {
     return this.instance !== undefined;
   }
 
-  private get containersFromConfig(): string[] {
-    const containers = this.project.config?.services;
-    if (!containers) return [];
-    return Object.keys(containers).filter((container) => {
-      const networks = containers[container].networks;
-      if (!networks) return `${this.project.name}_default` === this.name;
-      if (Array.isArray(networks)) return networks.includes(this.name);
-      return networks[this.name];
+  get createdOn(): Date | undefined {
+    return this.instance?.Created ? new Date(this.instance.Created) : undefined;
+  }
+
+  addContainer(container: Container) {
+    this._containers.add(container);
+  }
+
+  static async getAll(projects: Project[]): Promise<Network[]> {
+    // Actual running networks
+    const instances = (await this.getListOfNetworkInstances()).map(
+      (instance) => {
+        return {
+          project: projects.find(
+            (project) =>
+              project.name === instance.Labels?.["com.docker.compose.project"]
+          ),
+          instance: instance,
+          name: instance.Name!,
+        };
+      }
+    );
+    // Networks defined in docker-compose.yml > networks section
+    const composeNetworks = projects.flatMap((project) => {
+      return Object.entries(project.dockerCompose?.networks ?? {})
+        .filter(([_, config]) => config.external !== true)
+        .map(([name, config]) => ({
+          project,
+          name: config.name ?? `${project.name}_${name}`,
+          config,
+        }));
+    });
+
+    // Find projects where at least one service uses the default project network
+    const defaultNetworks = projects.flatMap((project) => {
+      const services = Object.values(project.dockerCompose?.services ?? {});
+      const useDefaultNetwork = services.some((service) => {
+        if (!service.networks) return true;
+        if (Array.isArray(service.networks))
+          return service.networks.length === 0;
+        return Object.keys(service.networks).length === 0;
+      });
+      return useDefaultNetwork
+        ? [
+            {
+              project,
+              name: `${project.name}_default`,
+              config: {},
+            },
+          ]
+        : [];
+    });
+
+    const uniqueNames = new Set([
+      ...instances.map((instance) => instance.name),
+      ...composeNetworks.map((network) => network.name),
+      ...defaultNetworks.map((network) => network.name),
+    ]);
+    return Array.from(uniqueNames).map((name) => {
+      const dockerCompose =
+        composeNetworks.find(
+          (network) => network.name === name && network.config
+        ) ?? defaultNetworks.find((network) => network.name === name);
+      const instance = instances.find(
+        (network) => network.name === name
+      )?.instance;
+      return new Network(name, dockerCompose, instance);
     });
   }
 
-  // Override json to prevent circular references
-  toJSON(): Record<string, unknown> {
-    return {
-      name: this.name,
-      containers: this.containers,
-    };
+  private static async getListOfNetworkInstances(): Promise<NetworkSummary[]> {
+    const networksApi = new NetworksApi();
+    const { data: networks } = await networksApi.networkList(
+      {},
+      { baseUrl: "http://localhost:2375" }
+    );
+    return networks;
   }
 }

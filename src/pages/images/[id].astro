@@ -1,34 +1,28 @@
 ---
 import Page from "@/components/page.astro";
-import { Images } from "@/typings/Images";
 import HexagonIcon from "@/assets/icons/lucide--hexagon.svg";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
 import Button from "@/components/button.astro";
+import { Host } from "@/models/host";
+import ImageCard from "@/components/containers/image-card.astro";
+import ContainerCard from "@/components/projects/container-card.astro";
 
 const { id } = Astro.params;
 if (!id) {
   return Astro.redirect("/images");
 }
 
-const images = new Images();
-const { data: imageData } = await images.imageInspect(
-  id,
-  {},
-  { baseUrl: "http://localhost:2375" }
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const image = host.images.find(
+  (images) => images.id === decodeURIComponent(id)
 );
-
-const { data: historyData } = await images.imageHistory(
-  id,
-  {},
-  { baseUrl: "http://localhost:2375" }
-);
+if (!image) {
+  return Astro.redirect("/images");
+}
 ---
 
 <Page
-  title={[
-    { text: "Images", href: "/images" },
-    { text: imageData?.RepoTags![0] },
-  ]}
+  title={[{ text: "Images", href: "/images" }, { text: image.name }]}
   icon={HexagonIcon}
 >
   <div slot="header">
@@ -40,18 +34,48 @@ const { data: historyData } = await images.imageHistory(
       theme="danger"
     />
   </div>
-  <h2>Image</h2>
-  <pre>{JSON.stringify(imageData, null, 2)}</pre>
-  <h2>History</h2>
-  <pre>{JSON.stringify(historyData, null, 2)}</pre>
+  {
+    image.containers.length > 0 && (
+      <section>
+        <h2>Containers</h2>
+        <div class="grid">
+          {image.containers.map((container) => (
+            <ContainerCard container={container} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+  <section>
+    <h2>Debug</h2>
+    <details>
+      <summary>Image</summary>
+      <pre>{JSON.stringify(image, null, 2)}</pre>
+    </details>
+  </section>
 </Page>
 
 <style>
-  h2 {
-    margin-top: 3em;
-    margin-bottom: 1em;
+  div {
+    display: flex;
+    gap: 8px;
+  }
+
+  section {
+    margin-block: 3em;
+    & > h2 {
+      margin-bottom: 1em;
+    }
+
+    & > .grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 16px;
+    }
   }
 </style>
+
 
 <script>
   import { actions } from "astro:actions";

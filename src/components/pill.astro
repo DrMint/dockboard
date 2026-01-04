@@ -4,16 +4,20 @@ interface Props {
     color?: string;
     fill?: boolean;
     small?: boolean;
+    inline?: boolean;
+    tooltip?: string;
 }
 
-const { text, color = "var(--color-border-neutral)", fill = false, small = false } = Astro.props;
+const { text, color = "var(--color-border-neutral)", fill = false, small = false, inline = false, tooltip } = Astro.props;
 ---
 
 <div
     data-component="pill"
     style={`--color: ${color};`}
+    title={tooltip}
     data-fill={fill}
     data-small={small}
+    data-inline={inline}
 >
     <div class="text">{text}</div>
 </div>
@@ -28,6 +32,10 @@ const { text, color = "var(--color-border-neutral)", fill = false, small = false
         color: var(--color-text-300);
         width: fit-content;
         border: 1px solid var(--color-surface-250);
+
+        &[data-inline="true"] {
+            display: inline-block;
+        }
 
         &[data-small="true"] {
             font-size: 70%;

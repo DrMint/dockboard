@@ -1,6 +1,5 @@
 ---
 import Page from "@/components/page.astro";
-import { Containers } from "@/typings/Containers";
 import ContainerIcon from "@/assets/icons/lucide--container.svg";
 import PlayIcon from "@/assets/icons/lucide--play.svg";
 import PauseIcon from "@/assets/icons/lucide--pause.svg";
@@ -9,35 +8,42 @@ import RefreshCwIcon from "@/assets/icons/lucide--refresh-cw.svg";
 import SkullIcon from "@/assets/icons/lucide--skull.svg";
 import CircleDivideIcon from "@/assets/icons/lucide--circle-divide.svg";
 import Button from "@/components/button.astro";
+import { Host } from "@/models/host";
+import ProjectCard from "@/components/containers/project-card.astro";
+import ImageCard from "@/components/containers/image-card.astro";
 
 const { name } = Astro.params;
 if (!name) {
   return Astro.redirect("/containers");
 }
 
-const containers = new Containers();
-const { data: containerData } = await containers.containerInspect(
-  name,
-  {},
-  { baseUrl: "http://localhost:2375" }
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const container = host.containers.find((container) => container.name === name);
+if (!container) {
+  return Astro.redirect("/containers");
+}
+const isStartable = ["created", "exited"].includes(container.state);
+const isStoppable = ["running", "paused", "restarting"].includes(
+  container.state
 );
-
-const isPaused = containerData!.State!.Paused!;
-const isRunning = containerData!.State!.Running!;
-
-const isStartable = !isRunning;
-const isStoppable = isRunning;
-const isRestartable = isRunning;
-const isKillable = isRunning;
-const isDeletable = !isRunning;
-const isPausable = isRunning && !isPaused;
-const isUnpausable = isRunning && isPaused;
+const isRestartable = ["created", "running", "paused"].includes(
+  container.state
+);
+const isKillable = ["running", "paused", "restarting"].includes(
+  container.state
+);
+const isDeletable = ["created", "exited", "dead"].includes(container.state);
+const isPausable = ["running"].includes(container.state);
+const isUnpausable = ["paused"].includes(container.state);
+const isUppable =
+  container.state === "down" &&
+  container.project?.dockerComposeFilePath !== undefined;
 ---
 
 <Page
   title={[
     { text: "Containers", href: "/containers" },
-    { text: containerData?.Name!.substring(1) },
+    { text: container.name },
   ]}
   icon={ContainerIcon}
 >
@@ -63,6 +69,15 @@ const isUnpausable = isRunning && isPaused;
       data-id={name}
       data-action="containers.stop"
       theme="warning"
+    />
+    <Button
+      visible={isUppable}
+      icon={PlayIcon}
+      label="Start"
+      data-id={container.serviceName}
+      data-action="projects.up"
+      data-path={container.project?.dockerComposeFilePath}
+      theme="success"
     />
     <Button
       visible={isStartable}
@@ -96,7 +111,35 @@ const isUnpausable = isRunning && isPaused;
       theme="danger"
     />
   </div>
-  <pre>{JSON.stringify(containerData, null, 2)}</pre>
+  {
+    container.project && (
+      <section>
+        <h2>Project</h2>
+        <div class="grid">
+          <ProjectCard container={container} project={container.project} />
+        </div>
+      </section>
+    )
+  }
+
+  {
+    container.image && (
+      <section>
+        <h2>Image</h2>
+        <div class="grid">
+          <ImageCard image={container.image} />
+        </div>
+      </section>
+    )
+  }
+
+  <section>
+    <h2>Debug</h2>
+    <details>
+      <summary>Container</summary>
+      <pre>{JSON.stringify(container, null, 2)}</pre>
+    </details>
+  </section>
 </Page>
 
 <script>
@@ -106,10 +149,11 @@ const isUnpausable = isRunning && isPaused;
     .querySelectorAll<HTMLButtonElement>("button[data-action][data-id]")
     .forEach((button) => {
       button.addEventListener("click", async () => {
-        const { action, id } = button.dataset;
+        const { action, id, path } = button.dataset;
         if (!action || !id) {
           return;
         }
+
         switch (action) {
           case "containers.start":
             await actions.containers.start({ id });
@@ -141,6 +185,11 @@ const isUnpausable = isRunning && isPaused;
               window.location.href = "/containers";
             }
             break;
+          case "projects.up":
+            if (!path) return;
+            await actions.projects.up({ path, service: id });
+            window.location.reload();
+            break;
           default:
             break;
         }
@@ -152,5 +201,19 @@ const isUnpausable = isRunning && isPaused;
   div {
     display: flex;
     gap: 8px;
+  }
+
+  section {
+    margin-block: 3em;
+    & > h2 {
+      margin-bottom: 1em;
+    }
+
+    & > .grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 16px;
+    }
   }
 </style>

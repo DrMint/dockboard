@@ -1,0 +1,68 @@
+---
+import type { Project } from "@/models/project";
+import Card from "../card.astro";
+import type { Container } from "@/models/container";
+import Pill from "../pill.astro";
+
+interface Props {
+  container: Container;
+  project: Project;
+}
+
+const { container, project } = Astro.props;
+---
+
+<Card href={`/projects/${project.name}`}>
+  <div class="card-header">
+    <h3>{project.name}</h3>
+    {
+      project.isRunning ? (
+        <Pill text={"Up"} color={"var(--color-border-success)"} />
+      ) : (
+        <Pill text="Down" color="var(--color-border-danger)" />
+      )
+    }
+  </div>
+  <div class="card-meta">
+    This container is part of the <Pill text={project.name} color="var(--color-surface-300)" fill small inline /> project{
+      container.serviceName === container.name ? (
+        ""
+      ) : (
+        <span>
+          under the service name <Pill text={container.serviceName} color="var(--color-surface-300)" fill small inline />
+        </span>
+      )
+    }
+  </div>
+</Card>
+
+<style>
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    & svg {
+      width: 16px;
+      height: 16px;
+      translate: 0 2px;
+      margin-right: 4px;
+    }
+
+    & h3 {
+      line-height: 1.3;
+    }
+
+    & + * {
+      border-top: 1px solid var(--color-surface-300);
+      padding-top: 10px;
+      margin-top: 10px;
+    }
+  }
+
+  .card-meta {
+    max-width: 15em;
+    line-height: 1.4;
+  }
+</style>

@@ -1,6 +1,5 @@
 ---
 import Page from "@/components/page.astro";
-import { Containers } from "@/typings/Containers";
 import ContainerIcon from "@/assets/icons/lucide--container.svg";
 import Button from "@/components/button.astro";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
@@ -8,14 +7,10 @@ import { formatUnixTimestamp } from "@/utils/formats";
 import Pill from "@/components/pill.astro";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
+import { Host } from "@/models/host";
 
-const containersApi = new Containers();
-const { data: containersData } = await containersApi.containerList(
-    { all: true },
-    { baseUrl: "http://localhost:2375" },
-);
-
-const containers = containersData.sort((a, b) => b.Created! - a.Created!);
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const containers = host.containers.sort((a, b) => (b.createdOn?.getTime() ?? 0) - (a.createdOn?.getTime() ?? 0));
 ---
 
 <Page
@@ -47,39 +42,36 @@ const containers = containersData.sort((a, b) => b.Created! - a.Created!);
                     containers.map((container) => (
                         <tr>
                             <td>
-                                <a href={`/containers/${container.Names![0].substring(1)}`}>
-                                    {container.Names![0].substring(1)}
+                                <a href={`/containers/${container.name}`}>
+                                    {container.name}
                                 </a>
                             </td>
                             <td>
-                                {
-                                    <a href={`/images/${container.ImageID}`}>
-                                        {container.Image!.split(":")[0]}
-                                    </a>
+                                {container.image && (
+                                    <a href={`/images/${container.image.id}`}>
+                                            {container.image.name}
+                                        </a>
+                                    )
                                 }
                             </td>
                             <td>
                                 <Pill
-                                    text={container.State!}
+                                    text={container.state}
                                     color={
-                                        container.State === "running"
+                                        container.state === "running"
                                             ? "var(--color-border-neutral)"
                                             : "var(--color-border-danger)"
                                     }
                                 />
                             </td>
-                            <td>{formatUnixTimestamp(container.Created!)}</td>
+                            <td>{ container.createdOn ? formatUnixTimestamp(container.createdOn.getTime()) : "-" }</td>
                             <td>
                                 {
-                                    <a
-                                        href={`/projects/${container.Labels!["com.docker.compose.project"]}`}
-                                    >
-                                        {
-                                            container.Labels![
-                                                "com.docker.compose.project"
-                                            ]
-                                        }
-                                    </a>
+                                    container.project && (
+                                        <a href={`/projects/${container.project.name}`}>
+                                            {container.project.name}
+                                        </a>
+                                    )
                                 }
                             </td>
                         </tr>
