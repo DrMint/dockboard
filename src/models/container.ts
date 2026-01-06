@@ -32,8 +32,13 @@ export class Container {
   }
 
   get imageName(): string | undefined {
-    if (!this.dockerCompose?.config.image) return undefined;
-    return Image.normalizeComposeImage(this.dockerCompose?.config.image);
+    if (this.dockerCompose?.config.image) {
+      return Image.normalizeComposeImage(this.dockerCompose?.config.image);
+    }
+    if (this.dockerCompose?.config.build) {
+      return `${this.dockerCompose.project.name}-${this.serviceName}:latest`;
+    }
+    return undefined;
   }
 
   get networks(): Network[] {
