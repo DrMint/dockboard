@@ -53,110 +53,6 @@ const { data: systemData } = await system.systemDataUsage(
     </ul>
   </div>
 
-  <details>
-    <summary>View projects</summary>
-    {
-      host.projects.map((project) => (
-        <div>
-          <h3>{project.name}</h3>
-          <ul>
-            <li>
-              Containers:{" "}
-              {project.containers.map((container) => container.name).join(", ")}
-            </li>
-            <li>
-              Networks:{" "}
-              {project.networks.map((network) => network.name).join(", ")}
-            </li>
-            <li>
-              Volumes: {project.volumes.map((volume) => volume.name).join(", ")}
-            </li>
-          </ul>
-        </div>
-      ))
-    }
-  </details>
-
-  <details>
-    <summary>View containers</summary>
-    {
-      host.containers.map((container) => (
-        <div>
-          <h3>{container.name}</h3>
-          <ul>
-            <li>
-              Networks:{" "}
-              {container.networks.map((network) => network.name).join(", ")}
-            </li>
-            <li>Project: {container.project?.name ?? "-"}</li>
-            <li>
-              Image: {container.image?.name ?? "-"} ({container.imageName})
-            </li>
-          </ul>
-        </div>
-      ))
-    }
-  </details>
-
-  <details>
-    <summary>View networks</summary>
-    {
-      host.networks.map((network) => (
-        <div>
-          <h3>{network.name}</h3>
-          <ul>
-            <li>
-              Containers:{" "}
-              {network.containers.map((container) => container.name).join(", ")}
-            </li>
-            <li>Project: {network.project?.name ?? "-"}</li>
-          </ul>
-        </div>
-      ))
-    }
-  </details>
-
-  <details>
-    <summary>View volumes</summary>
-    {
-      host.volumes.map((volume) => (
-        <div>
-          <h3>{volume.name}</h3>
-          <ul>
-            <li>Project: {volume.project?.name ?? "-"}</li>
-          </ul>
-        </div>
-      ))
-    }
-  </details>
-
-  <details>
-    <summary>View images</summary>
-    {
-      host.images
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((image) => (
-          <div>
-            <h3>{image.name}</h3>
-            <ul>
-              <li>
-                Containers:{" "}
-                {image.containers.map((container) => container.name).join(", ")}
-              </li>
-            </ul>
-          </div>
-        ))
-    }
-  </details>
-
-  <details>
-    <summary>View system information</summary>
-    <pre>{JSON.stringify(systemInfo, null, 2)}</pre>
-  </details>
-  <details>
-    <summary>View version information</summary>
-    <pre>{JSON.stringify(versionData, null, 2)}</pre>
-  </details>
   <div>
     <h2>System data usage</h2>
     <table>
@@ -204,10 +100,25 @@ const { data: systemData } = await system.systemDataUsage(
       </tbody>
     </table>
   </div>
-  <details>
-    <summary>View system data usage</summary>
-    <pre>{JSON.stringify(systemData, null, 2)}</pre>
-  </details>
+  <section>
+    <h2>Debug</h2>
+    <details>
+      <summary>View host</summary>
+      <pre>{JSON.stringify(host, null, 2)}</pre>
+    </details>
+    <details>
+      <summary>View system information</summary>
+      <pre>{JSON.stringify(systemInfo, null, 2)}</pre>
+    </details>
+    <details>
+      <summary>View version information</summary>
+      <pre>{JSON.stringify(versionData, null, 2)}</pre>
+    </details>
+    <details>
+      <summary>View system data usage</summary>
+      <pre>{JSON.stringify(systemData, null, 2)}</pre>
+    </details>
+  </section>
 </Page>
 
 <style>
