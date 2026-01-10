@@ -1,0 +1,37 @@
+---
+import Page from "@/components/page.astro";
+import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
+import { Host } from "@/models/host";
+import util from "util";
+
+const { name } = Astro.params;
+if (!name) {
+  return Astro.redirect("/builds");
+}
+
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const build = host.builds.find((build) => build.name === name);
+if (!build) {
+  return Astro.redirect("/builds");
+}
+---
+
+<Page
+  title={[{ text: "Builds", href: "/builds" }, { text: build.name }]}
+  icon={WrenchIcon}
+>
+  <section>
+    <h2>Debug</h2>
+    <details>
+      <summary>Build</summary>
+      <pre>{util.inspect(build, false, 2)}</pre>
+    </details>
+  </section>
+</Page>
+
+<style>
+  h2 {
+    margin-top: 3em;
+    margin-bottom: 1em;
+  }
+</style>

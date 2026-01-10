@@ -30,7 +30,9 @@ builds.sort((a, b) => a.name.localeCompare(b.name));
         {
           builds.map((build) => (
             <tr>
-              <td>{build.name}</td>
+              <td>
+                <a href={`/builds/${build.name}`}>{build.name}</a>
+              </td>
               <td>
                 {build.image ? (
                   <a href={`/images/${build.image.id}`}>{build.image.normalizedName}</a>
