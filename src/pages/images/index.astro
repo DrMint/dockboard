@@ -6,6 +6,7 @@ import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
 import Button from "@/components/button.astro";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
+import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
 import { Host } from "@/models/host";
 import { formatBytes, formatUnixTimestamp } from "@/utils/formats";
 
@@ -43,8 +44,12 @@ const images = host.images.toSorted(
           images.map((image) => (
             <tr>
               <td>
-                <a href={`/images/${encodeURIComponent(image.id)}`}>
+                <a
+                  href={`/images/${encodeURIComponent(image.id)}`}
+                  class="name"
+                >
                   {image.normalizedName}
+                  {image.build && <WrenchIcon />}
                 </a>
               </td>
               <td>
@@ -78,3 +83,17 @@ const images = host.images.toSorted(
     window.location.reload();
   });
 </script>
+
+<style>
+  .name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    & > svg {
+      width: 16px;
+      height: 16px;
+      color: var(--color-primary);
+    }
+  }
+</style>
