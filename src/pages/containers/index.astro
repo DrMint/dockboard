@@ -49,7 +49,7 @@ const containers = host.containers.sort(
               <td>
                 {container.image && (
                   <a href={`/images/${container.image.id}`}>
-                    {container.image.name}
+                    {container.image.normalizedName}
                   </a>
                 )}
               </td>

@@ -13,7 +13,7 @@ const { image } = Astro.props;
 
 <Card href={`/images/${image.id}`}>
   <div class="card-header">
-    <h3>{image.name}</h3>
+    <h3>{image.shortName}</h3>
     {
       image.isPulled ? (
         <Pill text="Available" color={"var(--color-border-success)"} />
@@ -26,12 +26,8 @@ const { image } = Astro.props;
     <p>Tags:</p>
     <div>
       {
-        image.tags.length > 0 ? (
-          image.tags.map((tag) => (
-            <Pill text={tag} color="var(--color-surface-300)" fill small />
-          ))
-        ) : (
-          <Pill text="untagged" color="var(--color-surface-300)" fill small />
+        image.name.tag && (
+          <Pill text={image.name.tag} color="var(--color-surface-300)" fill small />
         )
       }
     </div>

@@ -2,17 +2,60 @@ import type { ImageInspect, ImageSummary } from "@/typings/data-contracts";
 import { Images as ImagesApi } from "@/typings/Images";
 import type { Container } from "./container";
 import type { Project } from "./project";
+import type { Build } from "./build";
+import type { DockerComposeConfig } from "./docker-compose-schema";
+
+export interface ParsedImageRef {
+  raw?: string;
+  registry?: string;
+  repository?: string;
+  tag?: string;
+  digest?: string;
+}
 
 export class Image {
   private readonly _containers: Set<Container> = new Set();
   private _build: Build | undefined = undefined;
 
   private constructor(
-    public readonly name: string,
     public readonly id: string,
+    private readonly instanceImageRef?: ParsedImageRef,
+    private readonly composeImageRef?: ParsedImageRef,
     public readonly instance?: ImageInspect,
     public readonly summary?: ImageSummary
   ) { }
+
+  get name(): ParsedImageRef {
+    if (this.composeImageRef && this.instanceImageRef?.tag === "latest") {
+      return { ...this.instanceImageRef, tag: this.composeImageRef.tag };
+    }
+    return this.instanceImageRef ?? this.composeImageRef ?? {};
+  }
+
+  get normalizedName(): string {
+    let result = "";
+    if (this.name.registry && this.name.registry !== "docker.io") {
+      result += `${this.name.registry}/`;
+    }
+    if (this.name.repository) {
+      result += this.name.repository.replace("library/", "");
+    }
+    if (this.name.tag && this.name.tag !== "latest") {
+      result += `:${this.name.tag}`;
+    }
+    if (result === "") {
+      result = "<untagged>";
+    }
+    return result;
+  }
+
+  get shortName(): string {
+    let result = "";
+    if (this.name.repository) {
+      result += this.name.repository.replace("library/", "");
+    }
+    return result;
+  }
 
   get build(): Build | undefined {
     return this._build;
@@ -35,10 +78,6 @@ export class Image {
     return this.instance !== undefined;
   }
 
-  get tags(): string[] {
-    return (this.instance?.RepoTags ?? []).map((tag) => tag.split(":")[1]);
-  }
-
   get exposedPorts(): string[] {
     return Object.keys(this.instance?.Config?.ExposedPorts ?? {});
   }
@@ -54,9 +93,17 @@ export class Image {
   static async getAll(projects: Project[]): Promise<Image[]> {
     const imagesApi = new ImagesApi();
     const { data: imageSummaries } = await imagesApi.imageList(
-      {},
+      { all: true },
       { baseUrl: "http://localhost:2375" }
     );
+
+    const composeImageRefs = projects.flatMap((project) => {
+      return Object.entries(project.dockerCompose?.services ?? {}).flatMap(
+        ([serviceName, config]) => {
+          return this.getImageRefFromCompose(project, serviceName, config);
+        }
+      );
+    });
 
     const images = await Promise.all(
       imageSummaries.map(async (summary) => {
@@ -65,72 +112,122 @@ export class Image {
           {},
           { baseUrl: "http://localhost:2375" }
         );
-        return { inspect: request.data, summary };
+
+        let imageRef: ParsedImageRef = {};
+
+        const repoTag = request.data.RepoTags?.[0];
+        const repoDigest = request.data.RepoDigests?.[0];
+
+        if (repoDigest) {
+          imageRef = this.parseImageRef(repoDigest, false);
+          if (repoTag) {
+            imageRef.tag = this.parseImageRef(repoTag, false).tag;
+          }
+        } else if (repoTag) {
+          imageRef = this.parseImageRef(repoTag, true);
+        }
+
+        const composeImageRef = composeImageRefs.find((composeImageRef) => this.isSameImageRef(composeImageRef, imageRef));
+
+        return { inspect: request.data, summary, imageRef, composeImageRef };
       })
     );
 
-    const composeImageNames = projects.flatMap((project) => {
-      return Object.entries(project.dockerCompose?.services ?? {}).flatMap(
-        ([serviceName, config]) => {
-          if (config.image) {
-            return [this.normalizeComposeImage(config.image)]
-          }
-          if (config.build) {
-            return [`${project.name}-${serviceName}:latest`];
-          }
-          return [];
-        }
-      );
+    const completeList: { imageRef?: ParsedImageRef, composeImageRef?: ParsedImageRef, summary?: ImageSummary, inspect?: ImageInspect }[] = [...images];
+    composeImageRefs.forEach((composeImageRef) => {
+      const image = images.find((image) => this.isSameImageRef(composeImageRef, image.imageRef));
+      if (!image) {
+        completeList.push({
+          composeImageRef,
+        });
+      }
     });
 
-    const composeImagesNotInstanciated = composeImageNames.filter(
-      (name) =>
-        images.find(
-          (image) =>
-            (image.summary.RepoTags?.[0] ?? image.summary.RepoDigests?.[0]) ===
-            name
-        ) === undefined
+    return completeList.map((image) => {
+      return new Image(image.summary?.Id ?? image.composeImageRef?.raw ?? "", image.imageRef, image.composeImageRef, image?.inspect);
+    });
+  }
+
+  static isSameImageRef(ref1: ParsedImageRef, ref2: ParsedImageRef): boolean {
+    if (ref1.digest && ref2.digest && ref1.digest !== undefined) {
+      return ref1.digest === ref2.digest;
+    }
+    return ref1.registry === ref2.registry && ref1.repository === ref2.repository && ref1.tag === ref2.tag;
+  }
+
+  static parseImageRef(input: string, isLocal: boolean): ParsedImageRef {
+    // --- 0. Trim and replace environment variables
+    let ref = input.trim();
+    ref = ref.replaceAll(
+      /\$\{[^}:]+:-([^}]+)\}/g,
+      "$1"
     );
 
-    console.log(composeImagesNotInstanciated);
-
-    const uniqueImages = new Set([
-      ...images.map((image) => image.summary.Id),
-      ...composeImagesNotInstanciated,
-    ]);
-
-    return Array.from(uniqueImages).map((id) => {
-      const inspect = images.find((image) => image.summary.Id === id)?.inspect;
-
-      const name = inspect?.RepoTags?.[0] ?? inspect?.RepoDigests?.[0] ?? id;
-
-      return new Image(this.formatImageName(name), id, inspect);
-    });
-  }
-
-  static formatImageName(name: string): string {
-    // Drop digest if present
-    name = name.replace(/@sha256:[a-f0-9]{64}/, "");
-    return name;
-  }
-
-  static normalizeComposeImage(image: string): string {
-    // Drop default registry
-    image = image.replace(/^docker\.io\//, "");
-    image = image.replace(/^library\//, "");
-
-    // Check if the image reference contains a digest
-    const digest = image.match(/@sha256:[a-f0-9]{64}/);
-
-    // If true, remove the tag if present (the tag is the part after : and before @)
-    if (digest) {
-      return image.replace(/:[^:@]+@/, "@");
-    } else {
-      // If no digest and notag is present, add the default tag
-      if (!image.includes(":")) {
-        image = `${image}:latest`;
-      }
-      return image;
+    // --- 1. Split digest (if any)
+    let digest: string | undefined;
+    const digestIndex = ref.indexOf("@");
+    if (digestIndex !== -1) {
+      digest = ref.slice(digestIndex + 1);
+      ref = ref.slice(0, digestIndex);
     }
+
+    // --- 2. Split tag (only after last slash)
+    let tag = "latest";
+    const lastColon = ref.lastIndexOf(":");
+    const lastSlash = ref.lastIndexOf("/");
+
+    if (lastColon > lastSlash) {
+      tag = ref.slice(lastColon + 1);
+      ref = ref.slice(0, lastColon);
+    }
+
+    // --- 3. Split registry vs repository
+    let registry = isLocal ? undefined : "docker.io";
+    let repository = ref;
+
+    const firstSlash = ref.indexOf("/");
+
+    if (firstSlash !== -1) {
+      const firstPart = ref.slice(0, firstSlash);
+      if (
+        firstPart.includes(".") ||
+        firstPart.includes(":") ||
+        firstPart === "localhost"
+      ) {
+        registry = firstPart;
+        repository = ref.slice(firstSlash + 1);
+      }
+    }
+
+    // --- 4. Docker Hub implicit library namespace
+    if (registry === "docker.io" && !repository.includes("/")) {
+      repository = `library/${repository}`;
+    }
+
+    return {
+      raw: input,
+      registry,
+      repository,
+      tag,
+      digest,
+    };
+  }
+
+  static getImageRefFromCompose(project: Project, serviceName: string, config: DockerComposeConfig["services"][string]): ParsedImageRef {
+    if (config.image) {
+      const result = this.parseImageRef(config.image, config.build !== undefined);
+      if (config.build) {
+        result.registry = undefined;
+      }
+      return result;
+    }
+    if (config.build) {
+      const result: ParsedImageRef = {
+        repository: `${project.name}-${serviceName}`,
+        tag: "latest",
+      };
+      return result;
+    }
+    return {};
   }
 }

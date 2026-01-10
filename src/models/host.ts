@@ -44,11 +44,20 @@ export class Host {
       volume.project?.addVolume(volume);
     });
 
+    // Link builds <--> images
+    builds.forEach((build) => {
+      const image = images.find((image) => Image.isSameImageRef(build.imageRef, image.name));
+      if (image) {
+        build.setImage(image);
+        image.setBuild(build);
+      }
+    });
+
     // Link images <--> containers
     containers.forEach((container) => {
       const image =
         images.find((image) => image.id === container.imageId) ??
-        images.find((image) => image.name === container.imageName);
+        images.find((image) => container.imageRef && Image.isSameImageRef(container.imageRef, image.name));
 
       if (image) {
         container.setImage(image);

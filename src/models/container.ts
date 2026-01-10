@@ -3,7 +3,7 @@ import type { DockerComposeConfig } from "./docker-compose-schema";
 import { Containers as ContainersApi } from "@/typings/Containers";
 import { Project } from "./project";
 import { Network } from "./network";
-import { Image } from "./image";
+import { Image, type ParsedImageRef } from "./image";
 
 export class Container {
   private readonly _networks: Set<Network> = new Set();
@@ -17,7 +17,7 @@ export class Container {
       config: DockerComposeConfig["services"][string];
     },
     private readonly instance?: ContainerSummary
-  ) {}
+  ) { }
 
   get image(): Image | undefined {
     return this._image;
@@ -31,14 +31,10 @@ export class Container {
     return this.instance?.ImageID;
   }
 
-  get imageName(): string | undefined {
-    if (this.dockerCompose?.config.image) {
-      return Image.normalizeComposeImage(this.dockerCompose?.config.image);
+  get imageRef(): ParsedImageRef | undefined {
+    if (this.dockerCompose) {
+      return Image.getImageRefFromCompose(this.dockerCompose.project, this.serviceName, this.dockerCompose.config);
     }
-    if (this.dockerCompose?.config.build) {
-      return `${this.dockerCompose.project.name}-${this.serviceName}:latest`;
-    }
-    return undefined;
   }
 
   get networks(): Network[] {

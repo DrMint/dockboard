@@ -21,7 +21,7 @@ if (!image) {
 ---
 
 <Page
-  title={[{ text: "Images", href: "/images" }, { text: image.name }]}
+  title={[{ text: "Images", href: "/images" }, { text: image.normalizedName }]}
   icon={HexagonIcon}
 >
   <div slot="header">
@@ -33,6 +33,40 @@ if (!image) {
       theme="danger"
     />
   </div>
+
+  <section>
+    <h2>Image</h2>
+    <p><strong>ID:</strong> {image.id}</p>
+    {
+      image.name.registry && (
+        <p>
+          <strong>Registry:</strong> {image.name.registry}
+        </p>
+      )
+    }
+    {
+      image.name.repository && (
+        <p>
+          <strong>Repository:</strong> {image.name.repository}
+        </p>
+      )
+    }
+    {
+      image.name.tag && (
+        <p>
+          <strong>Tag:</strong> {image.name.tag}
+        </p>
+      )
+    }
+    {
+      image.name.digest && (
+        <p>
+          <strong>Digest:</strong> {image.name.digest}
+        </p>
+      )
+    }
+  </section>
+
   {
     image.containers.length > 0 && (
       <section>
