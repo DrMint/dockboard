@@ -3,6 +3,12 @@ import Page from "@/components/page.astro";
 import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
+import { Host } from "@/models/host";
+import { formatUnixTimestamp } from "@/utils/formats";
+
+const host = await Host.fromDockerSocket("http://localhost:2375");
+const builds = host.builds;
+builds.sort((a, b) => a.name.localeCompare(b.name));
 ---
 
 <Page
@@ -15,9 +21,34 @@ import EmptyTable from "@/components/empty-table.astro";
       <thead>
         <tr>
           <th>Name</th>
+          <th>Image</th>
+          <th>Last built</th>
+          <th>Project</th>
         </tr>
       </thead>
+      <tbody>
+        {
+          builds.map((build) => (
+            <tr>
+              <td>{build.name}</td>
+              <td>
+                {build.image ? (
+                  <a href={`/images/${build.image.id}`}>{build.image.normalizedName}</a>
+                ) : (
+                  "-"
+                )}
+              </td>
+              <td>{build.image?.createdAt ? formatUnixTimestamp(build.image.createdAt) : "-"}</td>
+              <td>
+                <a href={`/projects/${build.project.name}`}>
+                  {build.project.name}
+                </a>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
     </table>
-    <EmptyTable message="No builds" />
+    {builds.length === 0 && <EmptyTable message="No builds" />}
   </Card>
 </Page>

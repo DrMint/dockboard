@@ -5,13 +5,23 @@ import type { Project } from "./project";
 
 export class Image {
   private readonly _containers: Set<Container> = new Set();
+  private _build: Build | undefined = undefined;
 
   private constructor(
     public readonly name: string,
     public readonly id: string,
     public readonly instance?: ImageInspect,
     public readonly summary?: ImageSummary
-  ) {}
+  ) { }
+
+  get build(): Build | undefined {
+    return this._build;
+  }
+
+
+  setBuild(build: Build) {
+    this._build = build;
+  }
 
   get containers(): Container[] {
     return Array.from(this._containers);

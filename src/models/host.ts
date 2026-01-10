@@ -4,6 +4,7 @@ import { Container } from "./container";
 import { Network } from "./network";
 import { Volume } from "./volume";
 import { Image } from "./image";
+import { Build } from "./build";
 
 export class Host {
   private constructor(
@@ -12,8 +13,9 @@ export class Host {
     public readonly containers: Container[],
     public readonly networks: Network[],
     public readonly volumes: Volume[],
-    public readonly images: Image[]
-  ) {}
+    public readonly images: Image[],
+    public readonly builds: Build[]
+  ) { }
 
   static async fromDockerSocket(url: string): Promise<Host> {
     const info = new Info();
@@ -25,6 +27,7 @@ export class Host {
     const networks = await Network.getAll(projects);
     const volumes = await Volume.getAll(projects);
     const images = await Image.getAll(projects);
+    const builds = await Build.getAll(projects);
 
     // Link containers --> projects
     containers.forEach((container) => {
@@ -79,7 +82,8 @@ export class Host {
       containers,
       networks,
       volumes,
-      images
+      images,
+      builds
     );
   }
 }
