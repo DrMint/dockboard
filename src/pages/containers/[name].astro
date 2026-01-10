@@ -11,6 +11,7 @@ import Button from "@/components/button.astro";
 import { Host } from "@/models/host";
 import ProjectCard from "@/components/containers/project-card.astro";
 import ImageCard from "@/components/containers/image-card.astro";
+import util from "util";
 
 const { name } = Astro.params;
 if (!name) {
@@ -137,7 +138,7 @@ const isUppable =
     <h2>Debug</h2>
     <details>
       <summary>Container</summary>
-      <pre>{JSON.stringify(container, null, 2)}</pre>
+      <pre>{util.inspect(container, false, 2)}</pre>
     </details>
   </section>
 </Page>

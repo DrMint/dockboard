@@ -5,6 +5,7 @@ import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
 import Button from "@/components/button.astro";
 import { Host } from "@/models/host";
 import ContainerCard from "@/components/projects/container-card.astro";
+import util from "util";
 
 const { id } = Astro.params;
 if (!id) {
@@ -83,7 +84,7 @@ if (!image) {
     <h2>Debug</h2>
     <details>
       <summary>Image</summary>
-      <pre>{JSON.stringify(image, null, 2)}</pre>
+      <pre>{util.inspect(image, false, 2)}</pre>
     </details>
   </section>
 </Page>
