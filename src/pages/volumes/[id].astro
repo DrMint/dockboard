@@ -1,14 +1,13 @@
 ---
 import Page from "@/components/page.astro";
 import HardDriveIcon from "@/assets/icons/lucide--hard-drive.svg";
-import { Host } from "@/models/host";
 
 const { id } = Astro.params;
 if (!id) {
   return Astro.redirect("/volumes");
 }
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const volume = host.volumes.find((volume) => volume.name === id);
 if (!volume) {
   return Astro.redirect("/volumes");

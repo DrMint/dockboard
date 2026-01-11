@@ -7,9 +7,10 @@ import { formatUnixTimestamp } from "@/utils/formats";
 import Pill from "@/components/pill.astro";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
-import { Host } from "@/models/host";
+import DownloadIcon from "@/assets/icons/lucide--download.svg";
+import { ImageUpdateStatus } from "@/models/image";
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const containers = host.containers.sort(
   (a, b) => (b.createdOn?.getTime() ?? 0) - (a.createdOn?.getTime() ?? 0)
 );
@@ -48,8 +49,14 @@ const containers = host.containers.sort(
               </td>
               <td>
                 {container.image && (
-                  <a href={`/images/${container.image.id}`}>
+                  <a href={`/images/${container.image.id}`} class="image-name">
                     {container.image.normalizedName}
+                    {container.image.isNewVersionAvailable?.status ===
+                      ImageUpdateStatus.UpdateAvailable && (
+                      <div title="An update is available!">
+                        <DownloadIcon class="update-available" />
+                      </div>
+                    )}
                   </a>
                 )}
               </td>
@@ -94,3 +101,24 @@ const containers = host.containers.sort(
     window.location.reload();
   });
 </script>
+
+<style>
+  .image-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    & svg {
+      width: 16px;
+      height: 16px;
+
+      &.built-image {
+        color: var(--color-primary);
+      }
+
+      &.update-available {
+        color: var(--color-text-warning);
+      }
+    }
+  }
+</style>

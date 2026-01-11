@@ -4,6 +4,7 @@ import { Containers as ContainersApi } from "@/typings/Containers";
 import { Project } from "./project";
 import { Network } from "./network";
 import { Image, type ParsedImageRef } from "./image";
+import { DOCKER_SOCKET_BASE_URL } from "astro:env/server";
 
 export class Container {
   private readonly _networks: Set<Network> = new Set();
@@ -162,7 +163,7 @@ export class Container {
       {
         all: true,
       },
-      { baseUrl: "http://localhost:2375" }
+      { baseUrl: DOCKER_SOCKET_BASE_URL }
     );
     return containers;
   }

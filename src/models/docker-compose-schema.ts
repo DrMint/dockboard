@@ -93,7 +93,7 @@ const serviceBuildSchema = z.union([
   z.string(),
   z
     .object({
-      context: z.string().optional(),
+      context: z.string(),
       dockerfile: z.string().optional(),
       pull: z.boolean().optional(),
       args: z
@@ -147,6 +147,7 @@ const serviceEnvironmentVariableSchema = z.union([
   z.string(),
   z.number(),
   z.boolean(),
+  z.null(),
 ]);
 const serviceEnvironmentMapSchema = z.record(
   z.string(),

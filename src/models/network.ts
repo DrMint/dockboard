@@ -3,6 +3,7 @@ import type { DockerComposeConfig } from "./docker-compose-schema";
 import { Networks as NetworksApi } from "@/typings/Networks";
 import type { Project } from "./project";
 import { Container } from "./container";
+import { DOCKER_SOCKET_BASE_URL } from "astro:env/server";
 
 export class Network {
   private readonly _containers: Set<Container> = new Set();
@@ -106,7 +107,7 @@ export class Network {
     const networksApi = new NetworksApi();
     const { data: networks } = await networksApi.networkList(
       {},
-      { baseUrl: "http://localhost:2375" }
+      { baseUrl: DOCKER_SOCKET_BASE_URL }
     );
     return networks;
   }

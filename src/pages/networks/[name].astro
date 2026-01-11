@@ -1,14 +1,13 @@
 ---
 import Page from "@/components/page.astro";
 import NetworkIcon from "@/assets/icons/lucide--network.svg";
-import { Host } from "@/models/host";
 
 const { name } = Astro.params;
 if (!name) {
   return Astro.redirect("/networks");
 }
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const network = host.networks.find((network) => network.name === name);
 if (!network) {
   return Astro.redirect("/networks");

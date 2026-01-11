@@ -15,7 +15,11 @@ export const formatUnixTimestamp = (
     typeof timestamp === "object"
       ? timestamp
       : new Date(typeof timestamp === "number" ? timestamp * 1000 : timestamp);
-  return raw ? date.toISOString() : timeago.format(date);
+  try {
+    return raw ? date.toISOString() : timeago.format(date);
+  } catch (error) {
+    return "invalid date";
+  }
 };
 
 export const capitalize = (string: string) => {

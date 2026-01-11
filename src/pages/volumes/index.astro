@@ -6,9 +6,8 @@ import Button from "@/components/button.astro";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
-import { Host } from "@/models/host";
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const volumes = host.volumes.toSorted(
   (a, b) => (b.createdOn?.getTime() ?? 0) - (a.createdOn?.getTime() ?? 0)
 );

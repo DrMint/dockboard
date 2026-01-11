@@ -1,0 +1,26 @@
+---
+import Card from "../card.astro";
+import type { Build } from "@/models/build";
+
+interface Props {
+  build: Build;
+}
+
+const { build } = Astro.props;
+---
+
+<Card href={`/builds/${build.name}`}>
+  <div class="card-content">
+    <h2>{build.name}</h2>
+    <p>Project: {build.project?.name}</p>
+  </div>
+</Card>
+
+<style>
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding-block: 1em;
+  }
+</style>

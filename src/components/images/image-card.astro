@@ -1,0 +1,70 @@
+---
+import Card from "../card.astro";
+import type { Image } from "@/models/image";
+import Pill from "../pill.astro";
+import Tag from "../tag.astro";
+
+interface Props {
+  image: Image;
+}
+
+const { image } = Astro.props;
+---
+
+<Card>
+  <div class="card-content">
+    <div>
+      <strong>ID:</strong>
+      <Tag label={image.id.split(":")[0]} value={image.id.split(":")[1]} />
+    </div>
+    {
+      image.name.registry && (
+        <p>
+          <strong>Registry:</strong> {image.name.registry}
+        </p>
+      )
+    }
+    {
+      image.name.repository && (
+        <p>
+          <strong>Repository:</strong> {image.name.repository}
+        </p>
+      )
+    }
+    {
+      image.name.tag && (
+        <div>
+          <strong>Tag:</strong>
+          <Pill text={image.name.tag} color="var(--color-surface-300)" fill />
+        </div>
+      )
+    }
+    {
+      image.name.digest && (
+        <div>
+          <strong>Digest:</strong>{" "}
+          <Tag
+            label={image.name.digest.split(":")[0]}
+            value={image.name.digest.split(":")[1]}
+          />
+        </div>
+      )
+    }
+  </div>
+</Card>
+
+<style>
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding-block: 1em;
+
+    & > div {
+      display: flex;
+      flex-direction: row;
+      gap: 7px;
+      align-items: center;
+    }
+  }
+</style>

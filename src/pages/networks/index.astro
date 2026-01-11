@@ -7,9 +7,8 @@ import EmptyTable from "@/components/empty-table.astro";
 import Pill from "@/components/pill.astro";
 import Button from "@/components/button.astro";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
-import { Host } from "@/models/host";
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const networks = host.networks.toSorted(
   (a, b) => (b.createdOn?.getTime() ?? 0) - (a.createdOn?.getTime() ?? 0)
 );

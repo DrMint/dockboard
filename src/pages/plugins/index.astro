@@ -1,17 +1,12 @@
 ---
 import Page from "@/components/page.astro";
-import { Plugins } from "@/typings/Plugins";
 import PlugIcon from "@/assets/icons/lucide--plug.svg";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
 
-const plugins = new Plugins();
-const { data: pluginsData } = await plugins.pluginList(
-  {},
-  {
-    baseUrl: "http://localhost:2375",
-  }
-);
+const { host } = Astro.locals;
+const plugins = host.plugins;
+plugins.sort((a, b) => a.name.localeCompare(b.name));
 ---
 
 <Page title={[{ text: "Plugins" }]} icon={PlugIcon}>
@@ -25,17 +20,17 @@ const { data: pluginsData } = await plugins.pluginList(
       </thead>
       <tbody>
         {
-          pluginsData.map((plugin) => (
+          plugins.map((plugin) => (
             <tr>
               <td>
-                <a href={`/plugins/${plugin.Name}`}>{plugin.Name}</a>
+                <a href={`/plugins/${plugin.name}`}>{plugin.name}</a>
               </td>
-              <td>{plugin.Enabled ? "Yes" : "No"}</td>
+              <td>{plugin.enabled ? "Yes" : "No"}</td>
             </tr>
           ))
         }
       </tbody>
     </table>
-    {pluginsData.length === 0 && <EmptyTable message="No plugins" />}
+    {plugins.length === 0 && <EmptyTable message="No plugins" />}
   </Card>
 </Page>

@@ -8,7 +8,6 @@ import RefreshCwIcon from "@/assets/icons/lucide--refresh-cw.svg";
 import SkullIcon from "@/assets/icons/lucide--skull.svg";
 import CircleDivideIcon from "@/assets/icons/lucide--circle-divide.svg";
 import Button from "@/components/button.astro";
-import { Host } from "@/models/host";
 import ProjectCard from "@/components/containers/project-card.astro";
 import ImageCard from "@/components/containers/image-card.astro";
 import util from "util";
@@ -18,7 +17,7 @@ if (!name) {
   return Astro.redirect("/containers");
 }
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const container = host.containers.find((container) => container.name === name);
 if (!container) {
   return Astro.redirect("/containers");

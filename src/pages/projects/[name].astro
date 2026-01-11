@@ -9,14 +9,16 @@ import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
 import ContainerCard from "@/components/projects/container-card.astro";
 import NetworkCard from "@/components/projects/network-card.astro";
 import VolumeCard from "@/components/projects/volume-card.astro";
-import { Host } from "@/models/host";
+import util from "util";
+import Card from "@/components/card.astro";
+import { Code } from 'astro:components';
 
 const { name } = Astro.params;
 if (!name) {
   return Astro.redirect("/projects");
 }
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const project = host.projects.find((project) => project.name === name);
 if (!project) {
   return Astro.redirect("/projects");
@@ -95,28 +97,52 @@ if (!project) {
     )
   }
 
+  {
+    project.envFiles.length > 0 && (
+      <section>
+        <h2>Env Files</h2>
+        <div class="grid">
+          {project.envFiles.map((envFile) => (
+            <Card >
+              <h3>{envFile.name}</h3>
+              {envFile.content && (
+                <Code lang="bash" code={envFile.content} />
+              )}
+            </Card>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
   <section>
     <h2>Debug</h2>
     <div class="debug-content">
+      {project.dockerComposeFileContent && (
       <details>
-        <summary>Docker Compose file ({project.dockerComposeFilePath})</summary>
-        <pre>{project.dockerComposeFileContent}</pre>
-      </details>
+          <summary>Docker Compose file ({project.dockerComposeFilePath})</summary>
+          <Code lang="yaml" code={project.dockerComposeFileContent} />
+        </details>
+      )}
       <details>
         <summary>Parsed config</summary>
-        <pre>{JSON.stringify(project.dockerCompose, null, 2)}</pre>
+        <pre>{util.inspect(project.dockerCompose, false, 2)}</pre>
+      </details>
+      <details>
+        <summary>Project</summary>
+        <pre>{util.inspect(project, false, 2)}</pre>
       </details>
       <details>
         <summary>Containers</summary>
-        <pre>{JSON.stringify(project.containers, null, 2)}</pre>
+        <pre>{util.inspect(project.containers, false, 2)}</pre>
       </details>
       <details>
         <summary>Networks</summary>
-        <pre>{JSON.stringify(project.networks, null, 2)}</pre>
+        <pre>{util.inspect(project.networks, false, 2)}</pre>
       </details>
       <details>
         <summary>Volumes</summary>
-        <pre>{JSON.stringify(project.volumes, null, 2)}</pre>
+        <pre>{util.inspect(project.volumes, false, 2)}</pre>
       </details>
     </div>
   </section>

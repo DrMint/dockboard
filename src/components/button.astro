@@ -5,10 +5,10 @@ interface Props {
   icon?: SvgComponent;
   label?: string;
   visible?: boolean;
-  theme?: "danger" | "warning" | "success";
+  theme?: "danger" | "warning" | "success" | "default";
 }
 
-const { icon: Icon, label, visible = true, theme, ...props } = Astro.props;
+const { icon: Icon, label, visible = true, theme = "default", ...props } = Astro.props;
 
 if (!visible) {
   return null;
@@ -55,6 +55,12 @@ if (!visible) {
       background-color: color-mix(in srgb, #a3ff57 10%, transparent);
       color: var(--color-text-100);
       border-color: color-mix(in srgb, #a3ff57 20%, transparent);
+    }
+
+    &[data-theme="default"] {
+      background-color: color-mix(in srgb, var(--color-primary) 5%, transparent);
+      color: var(--color-text-100);
+      border-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
     }
 
     & > svg {

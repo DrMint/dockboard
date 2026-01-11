@@ -4,9 +4,8 @@ import FileCodeIcon from "@/assets/icons/lucide--file-code.svg";
 import Toggle from "@/components/toggle.astro";
 import Card from "@/components/card.astro";
 import Tag from "@/components/tag.astro";
-import { Host } from "@/models/host";
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const projects = host.projects;
 projects.sort((a, b) => a.name.localeCompare(b.name));
 ---

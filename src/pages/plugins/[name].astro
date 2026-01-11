@@ -1,6 +1,5 @@
 ---
 import Page from "@/components/page.astro";
-import { Plugins } from "@/typings/Plugins";
 import PlugIcon from "@/assets/icons/lucide--plug.svg";
 
 const { name } = Astro.params;
@@ -8,15 +7,31 @@ if (!name) {
   return Astro.redirect("/plugins");
 }
 
-const plugins = new Plugins();
-const { data: pluginData } = await plugins.pluginInspect(name, {
-  baseUrl: "http://localhost:2375",
-});
+const { host } = Astro.locals;
+const plugin = host.plugins.find((plugin) => plugin.name === name);
+if (!plugin) {
+  return Astro.redirect("/plugins");
+}
 ---
 
 <Page
-  title={[{ text: "Plugins", href: "/plugins" }, { text: pluginData!.Name }]}
+  title={[{ text: "Plugins", href: "/plugins" }, { text: plugin.name }]}
   icon={PlugIcon}
 >
-  <pre>{JSON.stringify(pluginData, null, 2)}</pre>
+  <section>
+    <h2>Debug</h2>
+    <details>
+      <summary>Plugin</summary>
+      <pre>{JSON.stringify(plugin, null, 2)}</pre>
+    </details>
+  </section>
 </Page>
+
+<style>
+  section {
+    margin-block: 3em;
+    & > h2 {
+      margin-bottom: 1em;
+    }
+  }
+</style>

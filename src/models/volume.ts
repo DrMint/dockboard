@@ -2,6 +2,7 @@ import type { DockerComposeConfig } from "./docker-compose-schema";
 import type { Volume as VolumeSummary } from "@/typings/data-contracts";
 import { Volumes as VolumesApi } from "@/typings/Volumes";
 import type { Project } from "./project";
+import { DOCKER_SOCKET_BASE_URL } from "astro:env/server";
 
 export class Volume {
   constructor(
@@ -56,7 +57,7 @@ export class Volume {
     const volumesApi = new VolumesApi();
     const { data: volumes } = await volumesApi.volumeList(
       {},
-      { baseUrl: "http://localhost:2375" }
+      { baseUrl: DOCKER_SOCKET_BASE_URL }
     );
     return volumes.Volumes ?? [];
   }

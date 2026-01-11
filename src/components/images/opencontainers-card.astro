@@ -1,0 +1,117 @@
+---
+import Button from "../button.astro";
+import Card from "../card.astro";
+import type { Image } from "@/models/image";
+import { formatUnixTimestamp } from "@/utils/formats";
+
+interface Props {
+  image: Image;
+}
+
+const { image } = Astro.props;
+
+const latestGithubRelease = await image.getLatestGithubRelease();
+
+const hasLinks =
+  image.isNewVersionAvailable?.url ||
+  image.opencontainers.documentation ||
+  image.opencontainers.source ||
+  image.opencontainers.url;
+---
+
+<Card>
+  <div class="card-content">
+    <h2>{image.opencontainers.title ?? image.shortName}</h2>
+    {
+      image.opencontainers.description && (
+        <p>
+          <strong>Description:</strong> {image.opencontainers.description}
+        </p>
+      )
+    }
+    {
+      image.opencontainers.created && (
+        <p>
+          <strong>Created:</strong>{" "}
+          {formatUnixTimestamp(image.opencontainers.created, true)}
+        </p>
+      )
+    }
+
+    <p>
+      <strong>Image update status:</strong>
+      {
+        image.isNewVersionAvailable?.url ? (
+          <a href={image.isNewVersionAvailable.url} class="version-link">
+            {image.isNewVersionAvailable.message}
+          </a>
+        ) : (
+          image.isNewVersionAvailable?.message
+        )
+      }
+    </p>
+
+    <p>
+      <strong>Version:</strong>
+      {image.opencontainers.version ?? "unknown"}
+    </p>
+
+    {
+      latestGithubRelease && (
+        <p>
+          <strong>Latest release:</strong>{" "}
+          <a href={latestGithubRelease.url} class="version-link">
+            {latestGithubRelease.tag}
+          </a>
+          ({formatUnixTimestamp(latestGithubRelease.publishedAt)})
+        </p>
+      )
+    }
+
+    {
+      hasLinks && (
+        <div class="card-buttons">
+          {image.isNewVersionAvailable?.url && (
+            <a href={image.isNewVersionAvailable.url}>
+              <Button label="Registry" />
+            </a>
+          )}
+          {image.opencontainers.documentation && (
+            <a href={image.opencontainers.documentation}>
+              <Button label="Documentation" />
+            </a>
+          )}
+          {image.opencontainers.source && (
+            <a href={image.opencontainers.source}>
+              <Button label="Source" />
+            </a>
+          )}
+          {image.opencontainers.url &&
+            image.opencontainers.url !== image.opencontainers.source && (
+              <a href={image.opencontainers.url}>
+                <Button label="Site" />
+              </a>
+            )}
+        </div>
+      )
+    }
+  </div>
+</Card>
+
+<style>
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding-block: 1em;
+  }
+
+  .card-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .version-link {
+    text-decoration: underline;
+  }
+</style>

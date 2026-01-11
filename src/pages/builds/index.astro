@@ -3,10 +3,9 @@ import Page from "@/components/page.astro";
 import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
-import { Host } from "@/models/host";
 import { formatUnixTimestamp } from "@/utils/formats";
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const builds = host.builds;
 builds.sort((a, b) => a.name.localeCompare(b.name));
 ---

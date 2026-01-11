@@ -7,10 +7,11 @@ import EmptyTable from "@/components/empty-table.astro";
 import Button from "@/components/button.astro";
 import Trash2Icon from "@/assets/icons/lucide--trash-2.svg";
 import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
-import { Host } from "@/models/host";
 import { formatBytes, formatUnixTimestamp } from "@/utils/formats";
+import DownloadIcon from "@/assets/icons/lucide--download.svg";
+import { ImageUpdateStatus } from "@/models/image";
 
-const host = await Host.fromDockerSocket("http://localhost:2375");
+const { host } = Astro.locals;
 const images = host.images.toSorted(
   (a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)
 );
@@ -49,7 +50,16 @@ const images = host.images.toSorted(
                   class="name"
                 >
                   {image.normalizedName}
-                  {image.build && <WrenchIcon />}
+                  {image.build && (
+                    <div title="This image was built locally">
+                      <WrenchIcon class="built-image" />
+                    </div>
+                  )}
+                  {image.isNewVersionAvailable?.status === ImageUpdateStatus.UpdateAvailable && (
+                    <div title="An update is available!">
+                      <DownloadIcon class="update-available" />
+                    </div>
+                  )}
                 </a>
               </td>
               <td>
@@ -90,10 +100,17 @@ const images = host.images.toSorted(
     align-items: center;
     gap: 6px;
 
-    & > svg {
+    & svg {
       width: 16px;
       height: 16px;
-      color: var(--color-primary);
+
+      &.built-image {
+        color: var(--color-text-500);
+      }
+
+      &.update-available {
+        color: var(--color-primary-light);
+      }
     }
   }
 </style>

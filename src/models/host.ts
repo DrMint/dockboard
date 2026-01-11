@@ -5,6 +5,7 @@ import { Network } from "./network";
 import { Volume } from "./volume";
 import { Image } from "./image";
 import { Build } from "./build";
+import { Plugin } from "./plugin";
 
 export class Host {
   private constructor(
@@ -14,8 +15,9 @@ export class Host {
     public readonly networks: Network[],
     public readonly volumes: Volume[],
     public readonly images: Image[],
-    public readonly builds: Build[]
-  ) { }
+    public readonly builds: Build[],
+    public readonly plugins: Plugin[]
+  ) {}
 
   static async fromDockerSocket(url: string): Promise<Host> {
     const info = new Info();
@@ -28,6 +30,7 @@ export class Host {
     const volumes = await Volume.getAll(projects);
     const images = await Image.getAll(projects);
     const builds = await Build.getAll(projects);
+    const plugins = await Plugin.getAll();
 
     // Link containers --> projects
     containers.forEach((container) => {
@@ -46,7 +49,9 @@ export class Host {
 
     // Link builds <--> images
     builds.forEach((build) => {
-      const image = images.find((image) => Image.isSameImageRef(build.imageRef, image.name));
+      const image = images.find((image) =>
+        Image.isSameImageRef(build.imageRef, image.name)
+      );
       if (image) {
         build.setImage(image);
         image.setBuild(build);
@@ -57,7 +62,11 @@ export class Host {
     containers.forEach((container) => {
       const image =
         images.find((image) => image.id === container.imageId) ??
-        images.find((image) => container.imageRef && Image.isSameImageRef(container.imageRef, image.name));
+        images.find(
+          (image) =>
+            container.imageRef &&
+            Image.isSameImageRef(container.imageRef, image.name)
+        );
 
       if (image) {
         container.setImage(image);
@@ -92,7 +101,8 @@ export class Host {
       networks,
       volumes,
       images,
-      builds
+      builds,
+      plugins
     );
   }
 }

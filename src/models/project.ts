@@ -12,33 +12,44 @@ import { Volumes } from "@/typings/Volumes";
 import type { Container } from "./container";
 import type { Network } from "./network";
 import type { Volume } from "./volume";
+import { basename, dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import dotenv from "dotenv";
+import { DOCKER_SOCKET_BASE_URL } from "astro:env/server";
 
 type Config = {
   path: string;
+  workingDirectory: string;
+  rawContent?: string;
   content?: string;
   error?: ZodError;
   parsed?: DockerComposeConfig;
 };
 
+enum EnvFileScope {
+  PROJECT = "project",
+  SERVICE = "service",
+}
+
+type EnvFile = {
+  path: string;
+  name: string;
+  content?: string;
+  scope:
+    | { type: EnvFileScope.PROJECT }
+    | { type: EnvFileScope.SERVICE; serviceNames: string[] };
+};
+
 export class Project {
-  private readonly config: Config | undefined;
   private _networks: Set<Network> = new Set();
   private _containers: Set<Container> = new Set();
   private _volumes: Set<Volume> = new Set();
 
   private constructor(
     public readonly name: string,
-    config?: Pick<Config, "path" | "content"> | undefined
-  ) {
-    this.config = config;
-    if (this.config?.content) {
-      const parsed = dockerComposeConfigSchema.safeParse(
-        YAML.parse(this.config.content, { merge: true })
-      );
-      this.config.parsed = parsed.data;
-      this.config.error = parsed.error;
-    }
-  }
+    private readonly config?: Config | undefined,
+    private readonly _envFiles?: EnvFile[] | undefined
+  ) {}
 
   get networks(): Network[] {
     return Array.from(this._networks);
@@ -48,6 +59,10 @@ export class Project {
   }
   get volumes(): Volume[] {
     return Array.from(this._volumes);
+  }
+
+  get envFiles(): EnvFile[] {
+    return this._envFiles ?? [];
   }
 
   addNetwork(network: Network) {
@@ -76,16 +91,119 @@ export class Project {
     return this.config?.parsed;
   }
 
+  get workingDirectory(): string | undefined {
+    return this.config?.workingDirectory;
+  }
+
+  private static substituteEnv(
+    input: string,
+    env: Record<string, string | undefined>
+  ): string {
+    const VAR_REGEX = /\$\{([A-Z0-9_]+)(?:(:?[-?])([^}]*))?\}/gi;
+    return input.replace(VAR_REGEX, (_, name, operator, fallback) => {
+      const value = env[name];
+
+      if (value !== undefined && value !== "") {
+        return value;
+      }
+
+      if (operator === ":-" || operator === "-") {
+        return fallback ?? "";
+      }
+
+      if (operator === ":?" || operator === "?") {
+        throw new Error(
+          `Missing required env var ${name}: ${fallback || "no message"}`
+        );
+      }
+
+      return "";
+    });
+  }
+
+  static getEnvFiles(
+    path: string,
+    config: DockerComposeConfig | undefined
+  ): EnvFile[] {
+    const envFiles: Map<string, EnvFile> = new Map();
+    const workingDirectory = dirname(path);
+    // Test if .env exists
+    const envFilePath = join(workingDirectory, ".env");
+    if (existsSync(envFilePath)) {
+      envFiles.set(envFilePath, {
+        path: envFilePath,
+        name: ".env",
+        content: readFileSync(envFilePath, "utf8"),
+        scope: { type: EnvFileScope.PROJECT },
+      });
+    }
+
+    if (config?.services) {
+      for (const [key, service] of Object.entries(config.services)) {
+        if (!service.env_file) continue;
+
+        const handleEnvFile = (envFile: string | { path: string }) => {
+          const serviceName = service.container_name ?? key;
+          const relativePath =
+            typeof envFile === "string" ? envFile : envFile.path;
+          const path = join(workingDirectory, relativePath);
+
+          const existingEnvFile = envFiles.get(path);
+          if (existingEnvFile) {
+            if (existingEnvFile.scope.type === EnvFileScope.SERVICE) {
+              existingEnvFile.scope.serviceNames.push(serviceName);
+            }
+            return;
+          }
+
+          const name = basename(path);
+          envFiles.set(path, {
+            path,
+            name,
+            content: readFileSync(path, "utf8"),
+            scope: { type: EnvFileScope.SERVICE, serviceNames: [serviceName] },
+          });
+        };
+
+        if (Array.isArray(service.env_file)) {
+          service.env_file.forEach(handleEnvFile);
+        } else {
+          handleEnvFile(service.env_file);
+        }
+      }
+    }
+
+    return Array.from(envFiles.values());
+  }
+
   static async getAll(): Promise<Project[]> {
     const runningProjects = await this.getListOfRunningProjects();
     const dockerComposePaths = await this.getListOfDockerComposePaths();
     const dockerComposeConfigs = await Promise.all(
       dockerComposePaths.map(async (path) => {
+        const workingDirectory = dirname(path);
+        const envFilePath = join(workingDirectory, ".env");
+        const envFileContent = existsSync(envFilePath)
+          ? readFileSync(envFilePath, "utf8")
+          : "";
+        const envConfig = dotenv.parse(envFileContent);
         const content = await readFile(path, "utf8");
+        const substitutedContent = this.substituteEnv(content, envConfig);
+        const parsed = dockerComposeConfigSchema.safeParse(
+          YAML.parse(substitutedContent, { merge: true })
+        );
+
+        const envFiles = this.getEnvFiles(path, parsed.data);
+
         return {
           name: this.getProjectNameFromPath(path),
           path,
-          content,
+          rawContent: content,
+          content: substitutedContent,
+          parsed: parsed.data,
+          workingDirectory,
+          error: parsed.error,
+          envFiles,
         };
       })
     );
@@ -106,8 +224,12 @@ export class Project {
             ? {
                 path: config.path,
                 content: config.content,
+                workingDirectory: config.workingDirectory,
+                parsed: config.parsed,
+                error: config.error,
               }
-            : undefined
+            : undefined,
+          config?.envFiles
         );
       })
     );
@@ -117,10 +239,10 @@ export class Project {
     const [containers, networks, volumes] = await Promise.all([
       new Containers().containerList(
         { all: true },
-        { baseUrl: "http://localhost:2375" }
+        { baseUrl: DOCKER_SOCKET_BASE_URL }
       ),
-      new Networks().networkList({}, { baseUrl: "http://localhost:2375" }),
-      new Volumes().volumeList({}, { baseUrl: "http://localhost:2375" }),
+      new Networks().networkList({}, { baseUrl: DOCKER_SOCKET_BASE_URL }),
+      new Volumes().volumeList({}, { baseUrl: DOCKER_SOCKET_BASE_URL }),
     ]);
 
     const ressources = [

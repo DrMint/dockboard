@@ -9,6 +9,15 @@ import PlugIcon from "@/assets/icons/lucide--plug.svg";
 import TokenWhaleIcon from "@/assets/icons/token--whale.svg";
 
 const currentPage = Astro.url.pathname;
+
+const { host } = Astro.locals;
+const projectsCount = host.projects.length;
+const containersCount = host.containers.length;
+const imagesCount = host.images.length;
+const networksCount = host.networks.length;
+const volumesCount = host.volumes.length;
+const buildsCount = host.builds.length;
+const pluginsCount = host.plugins.length;
 ---
 
 <nav>
@@ -24,6 +33,7 @@ const currentPage = Astro.url.pathname;
   >
     <FileCodeIcon />
     <span>Projects</span>
+    <span class="count">{projectsCount}</span>
   </a>
   <a
     class="page"
@@ -32,6 +42,7 @@ const currentPage = Astro.url.pathname;
   >
     <ContainerIcon />
     <span>Containers</span>
+    <span class="count">{containersCount}</span>
   </a>
   <a
     class="page"
@@ -40,6 +51,7 @@ const currentPage = Astro.url.pathname;
   >
     <HexagonIcon />
     <span>Images</span>
+    <span class="count">{imagesCount}</span>
   </a>
   <a
     class="page"
@@ -48,6 +60,7 @@ const currentPage = Astro.url.pathname;
   >
     <NetworkIcon />
     <span>Networks</span>
+    <span class="count">{networksCount}</span>
   </a>
   <a
     class="page"
@@ -56,6 +69,7 @@ const currentPage = Astro.url.pathname;
   >
     <HardDriveIcon />
     <span>Volumes</span>
+    <span class="count">{volumesCount}</span>
   </a>
   <div class="divider"></div>
   <a
@@ -65,6 +79,7 @@ const currentPage = Astro.url.pathname;
   >
     <WrenchIcon />
     <span>Builds</span>
+    <span class="count">{buildsCount}</span>
   </a>
   <a
     class="page"
@@ -73,6 +88,7 @@ const currentPage = Astro.url.pathname;
   >
     <PlugIcon />
     <span>Plugins</span>
+    <span class="count">{pluginsCount}</span>
   </a>
 </nav>
 
@@ -146,6 +162,21 @@ const currentPage = Astro.url.pathname;
         background-color: var(--color-surface-250);
         border-left-color: var(--color-primary);
         font-weight: 600;
+
+        & > .count {
+          background-color: var(--color-surface-400);
+          color: var(--color-text-400);
+        }
+      }
+
+      & > .count {
+        background-color: var(--color-surface-300);
+        padding: 3px 6px;
+        border-radius: 9999px;
+        font-size: 75%;
+        font-weight: 600;
+        color: var(--color-text-500);
+        margin-left: auto;
       }
     }
 
