@@ -1,8 +1,9 @@
 ---
 import Card from "../card.astro";
-import type { Image } from "@/models/image";
+import { ImageUpdateStatus, type Image } from "@/models/image";
 import Pill from "../pill.astro";
 import { formatBytes, formatUnixTimestamp } from "@/utils/formats";
+import DownloadIcon from "@/assets/icons/lucide--download.svg";
 
 interface Props {
   image: Image;
@@ -13,7 +14,16 @@ const { image } = Astro.props;
 
 <Card href={`/images/${image.id}`}>
   <div class="card-header">
-    <h3>{image.shortName}</h3>
+    <div>
+      <h3>{image.shortName}</h3>
+      {
+        image.isNewVersionAvailable?.status === ImageUpdateStatus.UpdateAvailable && (
+          <div title="An update is available!">
+            <DownloadIcon class="update-available" />
+          </div>
+        )
+      }
+    </div>
     {
       image.isPulled ? (
         <Pill text="Available" color={"var(--color-border-success)"} />
@@ -77,8 +87,10 @@ const { image } = Astro.props;
       margin-right: 4px;
     }
 
-    & h3 {
-      line-height: 1.3;
+    & > div {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     & + * {
@@ -109,5 +121,9 @@ const { image } = Astro.props;
       flex-direction: column;
       gap: 2px;
     }
+  }
+
+  .update-available {
+    color: var(--color-primary-light);
   }
 </style>
