@@ -3,6 +3,7 @@ import Page from "@/components/page.astro";
 import PlugIcon from "@/assets/icons/lucide--plug.svg";
 import Card from "@/components/card.astro";
 import EmptyTable from "@/components/empty-table.astro";
+import Toggle from "@/components/toggle.astro";
 
 const { host } = Astro.locals;
 const plugins = host.plugins;
@@ -25,7 +26,13 @@ plugins.sort((a, b) => a.name.localeCompare(b.name));
               <td>
                 <a href={`/plugins/${plugin.name}`}>{plugin.name}</a>
               </td>
-              <td>{plugin.enabled ? "Yes" : "No"}</td>
+              <td>
+                <Toggle
+                  checked={plugin.enabled}
+                  data-action={plugin.enabled ? "plugins.disable" : "plugins.enable"}
+                  data-name={plugin.name}
+                />
+              </td>
             </tr>
           ))
         }
@@ -34,3 +41,27 @@ plugins.sort((a, b) => a.name.localeCompare(b.name));
     {plugins.length === 0 && <EmptyTable message="No plugins" />}
   </Card>
 </Page>
+
+<script>
+  import { actions } from "astro:actions";
+  document.querySelectorAll<HTMLElement>("[data-action]").forEach((el) => {
+    el.addEventListener("click", async () => {
+      const { action, name } = el.dataset;
+      if (!action || !name) {
+        return;
+      }
+      switch (action) {
+        case "plugins.enable":
+          await actions.plugins.enable({ name });
+          window.location.reload();
+          break;
+        case "plugins.disable":
+          await actions.plugins.disable({ name });
+          window.location.reload();
+          break;
+        default:
+          break;
+      }
+    });
+  });
+</script>
