@@ -17,11 +17,7 @@ export const images = {
     }),
     handler: async (input) => {
       const images = new Images();
-      await images.imageDelete(
-        input.id,
-        {},
-        { baseUrl: DOCKER_SOCKET_BASE_URL }
-      );
+      await images.imageDelete(input.id, {}, { baseUrl: DOCKER_SOCKET_BASE_URL });
     },
   }),
 };

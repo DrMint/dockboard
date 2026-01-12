@@ -49,9 +49,7 @@ export class Host {
 
     // Link builds <--> images
     builds.forEach((build) => {
-      const image = images.find((image) =>
-        Image.isSameImageRef(build.imageRef, image.name)
-      );
+      const image = images.find((image) => Image.isSameImageRef(build.imageRef, image.name));
       if (image) {
         build.setImage(image);
         image.setBuild(build);
@@ -63,9 +61,7 @@ export class Host {
       const image =
         images.find((image) => image.id === container.imageId) ??
         images.find(
-          (image) =>
-            container.imageRef &&
-            Image.isSameImageRef(container.imageRef, image.name)
+          (image) => container.imageRef && Image.isSameImageRef(container.imageRef, image.name)
         );
 
       if (image) {
@@ -78,16 +74,12 @@ export class Host {
     // Link containers <--> networks
     containers.forEach((container) => {
       container.networkNames.forEach((networkName) => {
-        const network = networks.find(
-          (network) => network.name === networkName
-        );
+        const network = networks.find((network) => network.name === networkName);
         if (network) {
           network.addContainer(container);
           container.addNetwork(network);
         } else {
-          console.error(
-            `Network ${networkName} not found for container ${container.name}`
-          );
+          console.error(`Network ${networkName} not found for container ${container.name}`);
         }
       });
     });

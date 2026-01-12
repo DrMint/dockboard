@@ -13,10 +13,19 @@ export default defineConfig({
 
   env: {
     schema: {
-      ASTRO_DATABASE_FILE: envField.string({ access: "public", context: "server" }),
-      ASTRO_DB_REMOTE_URL: envField.string({ access: "public", context: "server" }),
-      DOCKER_SOCKET_BASE_URL: envField.string({ access: "public", context: "server" })
-    }
+      ASTRO_DATABASE_FILE: envField.string({
+        access: "public",
+        context: "server",
+      }),
+      ASTRO_DB_REMOTE_URL: envField.string({
+        access: "public",
+        context: "server",
+      }),
+      DOCKER_SOCKET_BASE_URL: envField.string({
+        access: "public",
+        context: "server",
+      }),
+    },
   },
 
   integrations: [db()],

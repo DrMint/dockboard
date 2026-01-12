@@ -26,66 +26,38 @@ const pluginsCount = host.plugins.length;
     <span>Dock<br />board</span>
   </a>
   <div class="divider"></div>
-  <a
-    class="page"
-    href="/projects"
-    data-active={currentPage.startsWith("/projects")}
-  >
+  <a class="page" href="/projects" data-active={currentPage.startsWith("/projects")}>
     <FileCodeIcon />
     <span>Projects</span>
     <span class="count">{projectsCount}</span>
   </a>
-  <a
-    class="page"
-    href="/containers"
-    data-active={currentPage.startsWith("/containers")}
-  >
+  <a class="page" href="/containers" data-active={currentPage.startsWith("/containers")}>
     <ContainerIcon />
     <span>Containers</span>
     <span class="count">{containersCount}</span>
   </a>
-  <a
-    class="page"
-    href="/images"
-    data-active={currentPage.startsWith("/images")}
-  >
+  <a class="page" href="/images" data-active={currentPage.startsWith("/images")}>
     <HexagonIcon />
     <span>Images</span>
     <span class="count">{imagesCount}</span>
   </a>
-  <a
-    class="page"
-    href="/networks"
-    data-active={currentPage.startsWith("/networks")}
-  >
+  <a class="page" href="/networks" data-active={currentPage.startsWith("/networks")}>
     <NetworkIcon />
     <span>Networks</span>
     <span class="count">{networksCount}</span>
   </a>
-  <a
-    class="page"
-    href="/volumes"
-    data-active={currentPage.startsWith("/volumes")}
-  >
+  <a class="page" href="/volumes" data-active={currentPage.startsWith("/volumes")}>
     <HardDriveIcon />
     <span>Volumes</span>
     <span class="count">{volumesCount}</span>
   </a>
   <div class="divider"></div>
-  <a
-    class="page"
-    href="/builds"
-    data-active={currentPage.startsWith("/builds")}
-  >
+  <a class="page" href="/builds" data-active={currentPage.startsWith("/builds")}>
     <WrenchIcon />
     <span>Builds</span>
     <span class="count">{buildsCount}</span>
   </a>
-  <a
-    class="page"
-    href="/plugins"
-    data-active={currentPage.startsWith("/plugins")}
-  >
+  <a class="page" href="/plugins" data-active={currentPage.startsWith("/plugins")}>
     <PlugIcon />
     <span>Plugins</span>
     <span class="count">{pluginsCount}</span>

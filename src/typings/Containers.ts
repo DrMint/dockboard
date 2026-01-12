@@ -17,9 +17,7 @@ import type {
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
-export class Containers<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Containers<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Returns a list of containers. For details on the format, see the [inspect endpoint](#operation/ContainerInspect). Note that it uses a different, smaller representation of a container than inspecting a single container. For example, the list of linked containers is not propagated .
    *

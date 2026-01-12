@@ -18,7 +18,7 @@ export class Container {
       config: DockerComposeConfig["services"][string];
     },
     private readonly instance?: ContainerSummary
-  ) { }
+  ) {}
 
   get image(): Image | undefined {
     return this._image;
@@ -34,7 +34,11 @@ export class Container {
 
   get imageRef(): ParsedImageRef | undefined {
     if (this.dockerCompose) {
-      return Image.getImageRefFromCompose(this.dockerCompose.project, this.serviceName, this.dockerCompose.config);
+      return Image.getImageRefFromCompose(
+        this.dockerCompose.project,
+        this.serviceName,
+        this.dockerCompose.config
+      );
     }
   }
 
@@ -97,28 +101,23 @@ export class Container {
   }
 
   static async getAll(projects: Project[]): Promise<Container[]> {
-    const instances = (await this.getListOfContainerInstances()).map(
-      (instance) => {
-        return {
-          project: projects.find(
-            (project) =>
-              project.name === instance.Labels?.["com.docker.compose.project"]
-          ),
-          instance: instance,
-          name: instance.Names![0].slice(1),
-          serviceName: instance.Labels?.["com.docker.compose.service"] ?? "",
-        };
-      }
-    );
+    const instances = (await this.getListOfContainerInstances()).map((instance) => {
+      return {
+        project: projects.find(
+          (project) => project.name === instance.Labels?.["com.docker.compose.project"]
+        ),
+        instance: instance,
+        name: instance.Names![0].slice(1),
+        serviceName: instance.Labels?.["com.docker.compose.service"] ?? "",
+      };
+    });
     const services = projects.flatMap((project) => {
-      return Object.entries(project.dockerCompose?.services ?? {}).map(
-        ([name, config]) => ({
-          project,
-          name: config.container_name ?? `${project.name}-${name}-1`,
-          serviceName: name,
-          config,
-        })
-      );
+      return Object.entries(project.dockerCompose?.services ?? {}).map(([name, config]) => ({
+        project,
+        name: config.container_name ?? `${project.name}-${name}-1`,
+        serviceName: name,
+        config,
+      }));
     });
     const uniqueNames = new Set([
       ...instances.map((container) => container.name),
@@ -147,17 +146,11 @@ export class Container {
         : Object.keys(dockerCompose.config.networks ?? {})
       : [];
     const defaultNetwork =
-      networksFromDockerCompose.length === 0
-        ? [`${dockerCompose.project.name}_default`]
-        : [];
-    return Array.from(
-      new Set([...networksFromDockerCompose, ...defaultNetwork])
-    );
+      networksFromDockerCompose.length === 0 ? [`${dockerCompose.project.name}_default`] : [];
+    return Array.from(new Set([...networksFromDockerCompose, ...defaultNetwork]));
   }
 
-  private static async getListOfContainerInstances(): Promise<
-    ContainerSummary[]
-  > {
+  private static async getListOfContainerInstances(): Promise<ContainerSummary[]> {
     const containersApi = new ContainersApi();
     const { data: containers } = await containersApi.containerList(
       {

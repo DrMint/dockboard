@@ -43,10 +43,7 @@ const { image } = Astro.props;
       image.name.digest && (
         <div>
           <strong>Digest:</strong>{" "}
-          <Tag
-            label={image.name.digest.split(":")[0]}
-            value={image.name.digest.split(":")[1]}
-          />
+          <Tag label={image.name.digest.split(":")[0]} value={image.name.digest.split(":")[1]} />
         </div>
       )
     }

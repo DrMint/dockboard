@@ -1,4 +1,4 @@
-import { column, defineDb, NOW } from 'astro:db';
+import { column, defineDb, NOW } from "astro:db";
 
 // https://astro.build/db/config
 export default defineDb({
@@ -9,7 +9,7 @@ export default defineDb({
         responseHeaders: column.json(),
         responseBody: column.text(),
         timestamp: column.number({ default: NOW }),
-      }
-    }
-  }
+      },
+    },
+  },
 });

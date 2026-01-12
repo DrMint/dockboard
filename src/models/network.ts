@@ -43,18 +43,15 @@ export class Network {
 
   static async getAll(projects: Project[]): Promise<Network[]> {
     // Actual running networks
-    const instances = (await this.getListOfNetworkInstances()).map(
-      (instance) => {
-        return {
-          project: projects.find(
-            (project) =>
-              project.name === instance.Labels?.["com.docker.compose.project"]
-          ),
-          instance: instance,
-          name: instance.Name!,
-        };
-      }
-    );
+    const instances = (await this.getListOfNetworkInstances()).map((instance) => {
+      return {
+        project: projects.find(
+          (project) => project.name === instance.Labels?.["com.docker.compose.project"]
+        ),
+        instance: instance,
+        name: instance.Name!,
+      };
+    });
     // Networks defined in docker-compose.yml > networks section
     const composeNetworks = projects.flatMap((project) => {
       return Object.entries(project.dockerCompose?.networks ?? {})
@@ -71,8 +68,7 @@ export class Network {
       const services = Object.values(project.dockerCompose?.services ?? {});
       const useDefaultNetwork = services.some((service) => {
         if (!service.networks) return true;
-        if (Array.isArray(service.networks))
-          return service.networks.length === 0;
+        if (Array.isArray(service.networks)) return service.networks.length === 0;
         return Object.keys(service.networks).length === 0;
       });
       return useDefaultNetwork
@@ -93,12 +89,9 @@ export class Network {
     ]);
     return Array.from(uniqueNames).map((name) => {
       const dockerCompose =
-        composeNetworks.find(
-          (network) => network.name === name && network.config
-        ) ?? defaultNetworks.find((network) => network.name === name);
-      const instance = instances.find(
-        (network) => network.name === name
-      )?.instance;
+        composeNetworks.find((network) => network.name === name && network.config) ??
+        defaultNetworks.find((network) => network.name === name);
+      const instance = instances.find((network) => network.name === name)?.instance;
       return new Network(name, dockerCompose, instance);
     });
   }

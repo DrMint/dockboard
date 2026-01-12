@@ -13,9 +13,7 @@
 import { ErrorResponse, Plugin, PluginPrivilege } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Plugins<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Plugins<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Returns information about installed plugins.
    *

@@ -19,12 +19,7 @@ const volumes = host.volumes.toSorted(
   description="Volumes are the persistent storage that containers can use. They can be inspected, deleted, and created."
 >
   <div slot="header">
-    <Button
-      icon={Trash2Icon}
-      label="Prune"
-      data-action="volumes.prune"
-      theme="danger"
-    />
+    <Button icon={Trash2Icon} label="Prune" data-action="volumes.prune" theme="danger" />
   </div>
   <Card>
     <table>
@@ -39,13 +34,9 @@ const volumes = host.volumes.toSorted(
           volumes.map((volume) => (
             <tr>
               <td>
-                <a href={`/volumes/${volume.name}`}>
-                  {formatLongName(volume.name)}
-                </a>
+                <a href={`/volumes/${volume.name}`}>{formatLongName(volume.name)}</a>
               </td>
-              <td>
-                {volume.createdOn ? formatUnixTimestamp(volume.createdOn) : "-"}
-              </td>
+              <td>{volume.createdOn ? formatUnixTimestamp(volume.createdOn) : "-"}</td>
             </tr>
           ))
         }

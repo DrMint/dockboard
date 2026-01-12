@@ -38,27 +38,21 @@ projects.sort((a, b) => a.name.localeCompare(b.name));
                   <Tag
                     label="Containers"
                     value={project.containers.length}
-                    tooltip={project.containers
-                      .map((container) => container.name)
-                      .join("\n")}
+                    tooltip={project.containers.map((container) => container.name).join("\n")}
                   />
                 )}
                 {project.networks.length > 0 && (
                   <Tag
                     label="Networks"
                     value={project.networks.length}
-                    tooltip={project.networks
-                      .map((network) => network.name)
-                      .join("\n")}
+                    tooltip={project.networks.map((network) => network.name).join("\n")}
                   />
                 )}
                 {project.volumes.length > 0 && (
                   <Tag
                     label="Volumes"
                     value={project.volumes.length}
-                    tooltip={project.volumes
-                      .map((volume) => volume.name)
-                      .join("\n")}
+                    tooltip={project.volumes.map((volume) => volume.name).join("\n")}
                   />
                 )}
               </td>
@@ -66,9 +60,7 @@ projects.sort((a, b) => a.name.localeCompare(b.name));
                 {project.dockerComposeFilePath && (
                   <Toggle
                     checked={project.isRunning}
-                    data-action={
-                      project.isRunning ? "projects.down" : "projects.up"
-                    }
+                    data-action={project.isRunning ? "projects.down" : "projects.up"}
                     data-path={project.dockerComposeFilePath}
                   />
                 )}

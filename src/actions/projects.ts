@@ -18,13 +18,7 @@ export const projects = {
       path: z.string().describe("The path to the docker-compose.yml file"),
     }),
     handler: async (input) => {
-      await runCommand("docker", [
-        "compose",
-        "-f",
-        input.path,
-        "build",
-        "--no-cache",
-      ]);
+      await runCommand("docker", ["compose", "-f", input.path, "build", "--no-cache"]);
     },
   }),
   up: defineAction({

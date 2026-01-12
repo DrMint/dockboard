@@ -19,22 +19,18 @@ export class Volume {
   }
 
   get createdOn(): Date | undefined {
-    return this.instance?.CreatedAt
-      ? new Date(this.instance.CreatedAt)
-      : undefined;
+    return this.instance?.CreatedAt ? new Date(this.instance.CreatedAt) : undefined;
   }
 
   static async getAll(projects: Project[]): Promise<Volume[]> {
     const instances = await this.getListOfVolumeInstances();
 
     const volumes = projects.flatMap((project) => {
-      return Object.entries(project.dockerCompose?.volumes ?? {}).map(
-        ([name, config]) => ({
-          project,
-          name: config?.name ?? `${project.name}_${name}`,
-          config,
-        })
-      );
+      return Object.entries(project.dockerCompose?.volumes ?? {}).map(([name, config]) => ({
+        project,
+        name: config?.name ?? `${project.name}_${name}`,
+        config,
+      }));
     });
 
     const uniqueNames = new Set([
@@ -43,22 +39,15 @@ export class Volume {
     ]);
 
     return Array.from(uniqueNames).map((volumeName) => {
-      const dockerCompose = volumes.find(
-        (volume) => volume.name === volumeName
-      );
-      const instance = instances.find(
-        (instance) => instance.Name === volumeName
-      );
+      const dockerCompose = volumes.find((volume) => volume.name === volumeName);
+      const instance = instances.find((instance) => instance.Name === volumeName);
       return new Volume(volumeName, dockerCompose, instance);
     });
   }
 
   private static async getListOfVolumeInstances(): Promise<VolumeSummary[]> {
     const volumesApi = new VolumesApi();
-    const { data: volumes } = await volumesApi.volumeList(
-      {},
-      { baseUrl: DOCKER_SOCKET_BASE_URL }
-    );
+    const { data: volumes } = await volumesApi.volumeList({}, { baseUrl: DOCKER_SOCKET_BASE_URL });
     return volumes.Volumes ?? [];
   }
 }

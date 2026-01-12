@@ -30,10 +30,7 @@ const getContainerStateColor = (state: Container["state"]) => {
 <Card href={`/containers/${container.name}`}>
   <div class="card-header">
     <h3>{container.name}</h3>
-    <Pill
-      text={capitalize(container.state)}
-      color={getContainerStateColor(container.state)}
-    />
+    <Pill text={capitalize(container.state)} color={getContainerStateColor(container.state)} />
   </div>
   {
     container.networks.length > 0 && (
@@ -41,12 +38,7 @@ const getContainerStateColor = (state: Container["state"]) => {
         <p>Networks:</p>
         <div>
           {container.networks.map((network) => (
-            <Pill
-              text={network.name}
-              color="var(--color-surface-300)"
-              fill
-              small
-            />
+            <Pill text={network.name} color="var(--color-surface-300)" fill small />
           ))}
         </div>
       </div>

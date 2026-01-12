@@ -2,7 +2,7 @@
 import Page from "@/components/page.astro";
 import WrenchIcon from "@/assets/icons/lucide--wrench.svg";
 import util from "util";
-import { Code } from 'astro:components';
+import { Code } from "astro:components";
 
 const { name } = Astro.params;
 if (!name) {
@@ -16,11 +16,7 @@ if (!build) {
 }
 ---
 
-<Page
-  title={[{ text: "Builds", href: "/builds" }, { text: build.name }]}
-  icon={WrenchIcon}
->
-
+<Page title={[{ text: "Builds", href: "/builds" }, { text: build.name }]} icon={WrenchIcon}>
   {
     build.dockerfileContent && (
       <section>

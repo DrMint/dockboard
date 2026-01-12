@@ -41,9 +41,7 @@ builds.sort((a, b) => a.name.localeCompare(b.name));
               </td>
               <td>{build.image?.createdAt ? formatUnixTimestamp(build.image.createdAt) : "-"}</td>
               <td>
-                <a href={`/projects/${build.project.name}`}>
-                  {build.project.name}
-                </a>
+                <a href={`/projects/${build.project.name}`}>{build.project.name}</a>
               </td>
             </tr>
           ))

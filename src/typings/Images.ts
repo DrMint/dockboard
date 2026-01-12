@@ -18,9 +18,7 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Images<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Images<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Returns a list of images on the server. Note that it uses a different, smaller representation of an image than inspecting a single image.
    *

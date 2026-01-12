@@ -36,13 +36,7 @@ const { container, project } = Astro.props;
       ) : (
         <span>
           under the service name{" "}
-          <Pill
-            text={container.serviceName}
-            color="var(--color-surface-300)"
-            fill
-            small
-            inline
-          />
+          <Pill text={container.serviceName} color="var(--color-surface-300)" fill small inline />
         </span>
       )
     }

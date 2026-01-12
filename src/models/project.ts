@@ -1,10 +1,7 @@
 import fg from "fast-glob";
 import YAML from "yaml";
 import { readFile } from "node:fs/promises";
-import {
-  dockerComposeConfigSchema,
-  type DockerComposeConfig,
-} from "./docker-compose-schema";
+import { dockerComposeConfigSchema, type DockerComposeConfig } from "./docker-compose-schema";
 import type { ZodError } from "zod";
 import { Containers } from "@/typings/Containers";
 import { Networks } from "@/typings/Networks";
@@ -35,9 +32,7 @@ type EnvFile = {
   path: string;
   name: string;
   content?: string;
-  scope:
-    | { type: EnvFileScope.PROJECT }
-    | { type: EnvFileScope.SERVICE; serviceNames: string[] };
+  scope: { type: EnvFileScope.PROJECT } | { type: EnvFileScope.SERVICE; serviceNames: string[] };
 };
 
 export class Project {
@@ -95,10 +90,7 @@ export class Project {
     return this.config?.workingDirectory;
   }
 
-  private static substituteEnv(
-    input: string,
-    env: Record<string, string | undefined>
-  ): string {
+  private static substituteEnv(input: string, env: Record<string, string | undefined>): string {
     const VAR_REGEX = /\$\{([A-Z0-9_]+)(?:(:?[-?])([^}]*))?\}/gi;
     return input.replace(VAR_REGEX, (_, name, operator, fallback) => {
       const value = env[name];
@@ -112,19 +104,14 @@ export class Project {
       }
 
       if (operator === ":?" || operator === "?") {
-        throw new Error(
-          `Missing required env var ${name}: ${fallback || "no message"}`
-        );
+        throw new Error(`Missing required env var ${name}: ${fallback || "no message"}`);
       }
 
       return "";
     });
   }
 
-  static getEnvFiles(
-    path: string,
-    config: DockerComposeConfig | undefined
-  ): EnvFile[] {
+  static getEnvFiles(path: string, config: DockerComposeConfig | undefined): EnvFile[] {
     const envFiles: Map<string, EnvFile> = new Map();
     const workingDirectory = dirname(path);
     // Test if .env exists
@@ -144,8 +131,7 @@ export class Project {
 
         const handleEnvFile = (envFile: string | { path: string }) => {
           const serviceName = service.container_name ?? key;
-          const relativePath =
-            typeof envFile === "string" ? envFile : envFile.path;
+          const relativePath = typeof envFile === "string" ? envFile : envFile.path;
           const path = join(workingDirectory, relativePath);
 
           const existingEnvFile = envFiles.get(path);
@@ -183,9 +169,7 @@ export class Project {
       dockerComposePaths.map(async (path) => {
         const workingDirectory = dirname(path);
         const envFilePath = join(workingDirectory, ".env");
-        const envFileContent = existsSync(envFilePath)
-          ? readFileSync(envFilePath, "utf8")
-          : "";
+        const envFileContent = existsSync(envFilePath) ? readFileSync(envFilePath, "utf8") : "";
         const envConfig = dotenv.parse(envFileContent);
         const content = await readFile(path, "utf8");
         const substitutedContent = this.substituteEnv(content, envConfig);
@@ -215,9 +199,7 @@ export class Project {
 
     return Promise.all(
       Array.from(projectNames).map(async (name) => {
-        const config = dockerComposeConfigs.find(
-          (config) => config.name === name
-        );
+        const config = dockerComposeConfigs.find((config) => config.name === name);
         return new Project(
           name,
           config
@@ -237,24 +219,15 @@ export class Project {
 
   private static async getListOfRunningProjects(): Promise<string[]> {
     const [containers, networks, volumes] = await Promise.all([
-      new Containers().containerList(
-        { all: true },
-        { baseUrl: DOCKER_SOCKET_BASE_URL }
-      ),
+      new Containers().containerList({ all: true }, { baseUrl: DOCKER_SOCKET_BASE_URL }),
       new Networks().networkList({}, { baseUrl: DOCKER_SOCKET_BASE_URL }),
       new Volumes().volumeList({}, { baseUrl: DOCKER_SOCKET_BASE_URL }),
     ]);
 
-    const ressources = [
-      ...containers.data,
-      ...networks.data,
-      ...(volumes.data?.Volumes ?? []),
-    ];
+    const ressources = [...containers.data, ...networks.data, ...(volumes.data?.Volumes ?? [])];
     return Array.from(
       new Set(
-        ressources.flatMap(
-          (ressource) => ressource.Labels?.["com.docker.compose.project"] ?? []
-        )
+        ressources.flatMap((ressource) => ressource.Labels?.["com.docker.compose.project"] ?? [])
       )
     );
   }

@@ -1,10 +1,6 @@
 import { spawn } from "node:child_process";
 
-export const runCommand = (
-  cmd: string,
-  args: string[],
-  options = {}
-): Promise<void> => {
+export const runCommand = (cmd: string, args: string[], options = {}): Promise<void> => {
   return new Promise((resolve, reject) => {
     const child = spawn(cmd, args, {
       stdio: "inherit",

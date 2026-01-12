@@ -23,12 +23,7 @@ const images = host.images.toSorted(
   description="Images are the read-only templates used to create containers. They can be inspected, deleted, and pulled from registries."
 >
   <div slot="header">
-    <Button
-      icon={Trash2Icon}
-      label="Prune"
-      data-action="images.prune"
-      theme="danger"
-    />
+    <Button icon={Trash2Icon} label="Prune" data-action="images.prune" theme="danger" />
   </div>
   <Card>
     <table>
@@ -45,10 +40,7 @@ const images = host.images.toSorted(
           images.map((image) => (
             <tr>
               <td>
-                <a
-                  href={`/images/${encodeURIComponent(image.id)}`}
-                  class="name"
-                >
+                <a href={`/images/${encodeURIComponent(image.id)}`} class="name">
                   {image.normalizedName}
                   {image.build && (
                     <div title="This image was built locally">
@@ -72,9 +64,7 @@ const images = host.images.toSorted(
                   }
                 />
               </td>
-              <td>
-                {image.createdAt ? formatUnixTimestamp(image.createdAt) : "-"}
-              </td>
+              <td>{image.createdAt ? formatUnixTimestamp(image.createdAt) : "-"}</td>
               <td>{formatBytes(image.size)}</td>
             </tr>
           ))

@@ -19,9 +19,7 @@ import {
 } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
-export class System<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class System<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *

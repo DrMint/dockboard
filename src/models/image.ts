@@ -120,14 +120,11 @@ export class Image {
     const owner = match[1];
     const repo = match[2];
 
-    const res = await cachedFetch(
-      `https://api.github.com/repos/${owner}/${repo}/releases/latest`,
-      {
-        headers: {
-          Accept: "application/vnd.github+json",
-        },
-      }
-    );
+    const res = await cachedFetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`, {
+      headers: {
+        Accept: "application/vnd.github+json",
+      },
+    });
 
     const data = JSON.parse(res.body);
 
@@ -144,30 +141,18 @@ export class Image {
 
   get opencontainers(): Opencontainers {
     return {
-      created:
-        this.instance?.Config?.Labels?.["org.opencontainers.image.created"],
-      description:
-        this.instance?.Config?.Labels?.["org.opencontainers.image.description"],
-      documentation:
-        this.instance?.Config?.Labels?.[
-          "org.opencontainers.image.documentation"
-        ],
-      source:
-        this.instance?.Config?.Labels?.["org.opencontainers.image.source"],
+      created: this.instance?.Config?.Labels?.["org.opencontainers.image.created"],
+      description: this.instance?.Config?.Labels?.["org.opencontainers.image.description"],
+      documentation: this.instance?.Config?.Labels?.["org.opencontainers.image.documentation"],
+      source: this.instance?.Config?.Labels?.["org.opencontainers.image.source"],
       title: this.instance?.Config?.Labels?.["org.opencontainers.image.title"],
       url: this.instance?.Config?.Labels?.["org.opencontainers.image.url"],
-      version:
-        this.instance?.Config?.Labels?.["org.opencontainers.image.version"],
-      authors:
-        this.instance?.Config?.Labels?.["org.opencontainers.image.authors"],
-      licenses:
-        this.instance?.Config?.Labels?.["org.opencontainers.image.licenses"],
-      refName:
-        this.instance?.Config?.Labels?.["org.opencontainers.image.ref.name"],
-      revision:
-        this.instance?.Config?.Labels?.["org.opencontainers.image.revision"],
-      vendor:
-        this.instance?.Config?.Labels?.["org.opencontainers.image.vendor"],
+      version: this.instance?.Config?.Labels?.["org.opencontainers.image.version"],
+      authors: this.instance?.Config?.Labels?.["org.opencontainers.image.authors"],
+      licenses: this.instance?.Config?.Labels?.["org.opencontainers.image.licenses"],
+      refName: this.instance?.Config?.Labels?.["org.opencontainers.image.ref.name"],
+      revision: this.instance?.Config?.Labels?.["org.opencontainers.image.revision"],
+      vendor: this.instance?.Config?.Labels?.["org.opencontainers.image.vendor"],
     };
   }
 
@@ -251,9 +236,7 @@ export class Image {
       inspect?: ImageInspect;
     }[] = [...images];
     composeImageRefs.forEach((composeImageRef) => {
-      const image = images.find((image) =>
-        this.isSameImageRef(composeImageRef, image.imageRef)
-      );
+      const image = images.find((image) => this.isSameImageRef(composeImageRef, image.imageRef));
       if (!image) {
         completeList.push({
           composeImageRef,
@@ -317,11 +300,7 @@ export class Image {
 
     if (firstSlash !== -1) {
       const firstPart = ref.slice(0, firstSlash);
-      if (
-        firstPart.includes(".") ||
-        firstPart.includes(":") ||
-        firstPart === "localhost"
-      ) {
+      if (firstPart.includes(".") || firstPart.includes(":") || firstPart === "localhost") {
         registry = firstPart;
         repository = ref.slice(firstSlash + 1);
       }
@@ -347,10 +326,7 @@ export class Image {
     config: DockerComposeConfig["services"][string]
   ): ParsedImageRef {
     if (config.image) {
-      const result = this.parseImageRef(
-        config.image,
-        config.build !== undefined
-      );
+      const result = this.parseImageRef(config.image, config.build !== undefined);
       if (config.build) {
         result.registry = undefined;
       }
@@ -368,16 +344,21 @@ export class Image {
 
   private static async isNewVersionAvailable(
     name: ParsedImageRef,
-    composeName?: ParsedImageRef,
+    composeName?: ParsedImageRef
   ): Promise<ImageUpdateResult> {
     if (composeName?.digest) {
-      return { status: ImageUpdateStatus.UpdateBlocked, message: "checks aborted, version is locked to a specific digest in the compose file." };
+      return {
+        status: ImageUpdateStatus.UpdateBlocked,
+        message: "checks aborted, version is locked to a specific digest in the compose file.",
+      };
     }
 
     if (!name.registry || !name.repository || !name.tag) {
-      return { status: ImageUpdateStatus.Unknown, message: "unable to check for updates, the image is probably built locally." };
+      return {
+        status: ImageUpdateStatus.Unknown,
+        message: "unable to check for updates, the image is probably built locally.",
+      };
     }
-
 
     if (name.registry === "docker.io") {
       // 1. get token
@@ -400,7 +381,10 @@ export class Image {
       // 3. read digest
       const digest = manifestRes.headers["docker-content-digest"];
       if (!digest || !name.digest) {
-        return { status: ImageUpdateStatus.Unknown, message: "unable to check for updates, docker.io returned no digest." };
+        return {
+          status: ImageUpdateStatus.Unknown,
+          message: "unable to check for updates, docker.io returned no digest.",
+        };
       }
 
       const result = digest !== name.digest;
@@ -430,7 +414,10 @@ export class Image {
       // 3. read digest
       const digest = manifestRes.headers["docker-content-digest"];
       if (!digest || !name.digest) {
-        return { status: ImageUpdateStatus.Unknown, message: "unable to check for updates, ghcr.io returned no digest." };
+        return {
+          status: ImageUpdateStatus.Unknown,
+          message: "unable to check for updates, ghcr.io returned no digest.",
+        };
       }
 
       const result = digest !== name.digest;
@@ -442,7 +429,10 @@ export class Image {
         url: `https://github.com/${name.repository}/pkgs/container/${repo}`,
       };
     } else {
-      return { status: ImageUpdateStatus.Unknown, message: `unable to check for updates, ${name.registry} is not a supported registry.` };
+      return {
+        status: ImageUpdateStatus.Unknown,
+        message: `unable to check for updates, ${name.registry} is not a supported registry.`,
+      };
     }
   }
 }

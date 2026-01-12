@@ -244,13 +244,7 @@ export interface Mount {
   /** Optional configuration for the `bind` type. */
   BindOptions?: {
     /** A propagation mode with the value `[r]private`, `[r]shared`, or `[r]slave`. */
-    Propagation?:
-      | "private"
-      | "rprivate"
-      | "shared"
-      | "rshared"
-      | "slave"
-      | "rslave";
+    Propagation?: "private" | "rprivate" | "shared" | "rshared" | "slave" | "rslave";
     /**
      * Disable recursive bind mount.
      * @default false
@@ -3912,14 +3906,7 @@ export interface ContainerSummary {
    * The state of this container.
    * @example "running"
    */
-  State?:
-    | "created"
-    | "running"
-    | "paused"
-    | "restarting"
-    | "exited"
-    | "removing"
-    | "dead";
+  State?: "created" | "running" | "paused" | "restarting" | "exited" | "removing" | "dead";
   /**
    * Additional human-readable status of this container (e.g. `Exit 0`)
    * @example "Up 4 days"
@@ -4138,14 +4125,7 @@ export type ContainerState = {
    * "running", "paused", "restarting", "removing", "exited", or "dead".
    * @example "running"
    */
-  Status?:
-    | "created"
-    | "running"
-    | "paused"
-    | "restarting"
-    | "removing"
-    | "exited"
-    | "dead";
+  Status?: "created" | "running" | "paused" | "restarting" | "removing" | "exited" | "dead";
   /**
    * Whether this container is running.
    *

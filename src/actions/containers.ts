@@ -11,11 +11,7 @@ export const containers = {
     }),
     handler: async (input) => {
       const containers = new Containers();
-      await containers.containerStart(
-        input.id,
-        {},
-        { baseUrl: DOCKER_SOCKET_BASE_URL }
-      );
+      await containers.containerStart(input.id, {}, { baseUrl: DOCKER_SOCKET_BASE_URL });
     },
   }),
   stop: defineAction({
@@ -25,11 +21,7 @@ export const containers = {
     }),
     handler: async (input) => {
       const containers = new Containers();
-      await containers.containerStop(
-        input.id,
-        {},
-        { baseUrl: DOCKER_SOCKET_BASE_URL }
-      );
+      await containers.containerStop(input.id, {}, { baseUrl: DOCKER_SOCKET_BASE_URL });
     },
   }),
   restart: defineAction({
@@ -39,11 +31,7 @@ export const containers = {
     }),
     handler: async (input) => {
       const containers = new Containers();
-      await containers.containerRestart(
-        input.id,
-        {},
-        { baseUrl: DOCKER_SOCKET_BASE_URL }
-      );
+      await containers.containerRestart(input.id, {}, { baseUrl: DOCKER_SOCKET_BASE_URL });
     },
   }),
   kill: defineAction({
@@ -53,11 +41,7 @@ export const containers = {
     }),
     handler: async (input) => {
       const containers = new Containers();
-      await containers.containerKill(
-        input.id,
-        {},
-        { baseUrl: DOCKER_SOCKET_BASE_URL }
-      );
+      await containers.containerKill(input.id, {}, { baseUrl: DOCKER_SOCKET_BASE_URL });
     },
   }),
   pause: defineAction({
@@ -91,11 +75,7 @@ export const containers = {
     }),
     handler: async (input) => {
       const containers = new Containers();
-      await containers.containerDelete(
-        input.id,
-        {},
-        { baseUrl: DOCKER_SOCKET_BASE_URL }
-      );
+      await containers.containerDelete(input.id, {}, { baseUrl: DOCKER_SOCKET_BASE_URL });
     },
   }),
   prune: defineAction({

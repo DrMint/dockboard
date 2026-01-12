@@ -32,8 +32,7 @@ const hasLinks =
     {
       image.opencontainers.created && (
         <p>
-          <strong>Created:</strong>{" "}
-          {formatUnixTimestamp(image.opencontainers.created, true)}
+          <strong>Created:</strong> {formatUnixTimestamp(image.opencontainers.created, true)}
         </p>
       )
     }
@@ -86,12 +85,11 @@ const hasLinks =
               <Button label="Source" />
             </a>
           )}
-          {image.opencontainers.url &&
-            image.opencontainers.url !== image.opencontainers.source && (
-              <a href={image.opencontainers.url}>
-                <Button label="Site" />
-              </a>
-            )}
+          {image.opencontainers.url && image.opencontainers.url !== image.opencontainers.source && (
+            <a href={image.opencontainers.url}>
+              <Button label="Site" />
+            </a>
+          )}
         </div>
       )
     }

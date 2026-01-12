@@ -22,12 +22,7 @@ const containers = host.containers.sort(
   description="Containers are the runtime instances of images. They can be started, stopped, and inspected."
 >
   <div slot="header">
-    <Button
-      icon={Trash2Icon}
-      label="Prune"
-      data-action="containers.prune"
-      theme="danger"
-    />
+    <Button icon={Trash2Icon} label="Prune" data-action="containers.prune" theme="danger" />
   </div>
   <Card>
     <table>
@@ -71,15 +66,11 @@ const containers = host.containers.sort(
                 />
               </td>
               <td>
-                {container.createdOn
-                  ? formatUnixTimestamp(container.createdOn.getTime())
-                  : "-"}
+                {container.createdOn ? formatUnixTimestamp(container.createdOn.getTime()) : "-"}
               </td>
               <td>
                 {container.project && (
-                  <a href={`/projects/${container.project.name}`}>
-                    {container.project.name}
-                  </a>
+                  <a href={`/projects/${container.project.name}`}>{container.project.name}</a>
                 )}
               </td>
             </tr>
@@ -93,9 +84,7 @@ const containers = host.containers.sort(
 
 <script>
   import { actions } from "astro:actions";
-  const button = document.querySelector(
-    "button[data-action='containers.prune']"
-  );
+  const button = document.querySelector("button[data-action='containers.prune']");
   button?.addEventListener("click", async () => {
     await actions.containers.prune();
     window.location.reload();

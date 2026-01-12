@@ -13,9 +13,7 @@
 import { ErrorResponse } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
-export class Build<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Build<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Build an image from a tar archive with a `Dockerfile` in it. The `Dockerfile` specifies how the image is built from the tar archive. It is typically in the archive's root, but can be at a different path or have a different name by specifying the `dockerfile` parameter. [See the `Dockerfile` reference for more information](https://docs.docker.com/engine/reference/builder/). The Docker daemon performs a preliminary validation of the `Dockerfile` before starting the build, and returns an error if the syntax is incorrect. After that, each instruction is run one-by-one until the ID of the new image is output. The build is canceled if the client drops the connection by quitting or being killed.
    *

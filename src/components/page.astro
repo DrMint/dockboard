@@ -35,11 +35,7 @@ const { title, icon: Icon, description } = Astro.props;
                 {Icon && <Icon />}
                 {title.map((t, index) => (
                   <>
-                    {t.href !== undefined ? (
-                      <a href={t.href}>{t.text}</a>
-                    ) : (
-                      t.text
-                    )}
+                    {t.href !== undefined ? <a href={t.href}>{t.text}</a> : t.text}
                     {index < title.length - 1 && <span> › </span>}
                   </>
                 ))}
@@ -296,8 +292,8 @@ const { title, icon: Icon, description } = Astro.props;
 
   pre:has(code) {
     padding: 16px;
-      border-radius: 10px;
-      max-width: 60vw;
-      overflow: auto;
+    border-radius: 10px;
+    max-width: 60vw;
+    overflow: auto;
   }
 </style>

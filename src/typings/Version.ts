@@ -13,9 +13,7 @@
 import { ErrorResponse, SystemVersion } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
-export class Version<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Version<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Returns the version of Docker that is running and various information about the system that Docker is running on.
    *

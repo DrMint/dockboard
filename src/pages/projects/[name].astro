@@ -11,7 +11,7 @@ import NetworkCard from "@/components/projects/network-card.astro";
 import VolumeCard from "@/components/projects/volume-card.astro";
 import util from "util";
 import Card from "@/components/card.astro";
-import { Code } from 'astro:components';
+import { Code } from "astro:components";
 
 const { name } = Astro.params;
 if (!name) {
@@ -25,10 +25,7 @@ if (!project) {
 }
 ---
 
-<Page
-  title={[{ text: "Projects", href: "/projects" }, { text: name }]}
-  icon={FileCodeIcon}
->
+<Page title={[{ text: "Projects", href: "/projects" }, { text: name }]} icon={FileCodeIcon}>
   <div slot="header" class="header-buttons">
     <Button
       icon={DownloadIcon}
@@ -63,11 +60,7 @@ if (!project) {
   <section>
     <h2>Containers</h2>
     <div class="grid">
-      {
-        project.containers.map((container) => (
-          <ContainerCard container={container} />
-        ))
-      }
+      {project.containers.map((container) => <ContainerCard container={container} />)}
     </div>
   </section>
 
@@ -103,11 +96,9 @@ if (!project) {
         <h2>Env Files</h2>
         <div class="grid">
           {project.envFiles.map((envFile) => (
-            <Card >
+            <Card>
               <h3>{envFile.name}</h3>
-              {envFile.content && (
-                <Code lang="bash" code={envFile.content} />
-              )}
+              {envFile.content && <Code lang="bash" code={envFile.content} />}
             </Card>
           ))}
         </div>
@@ -118,12 +109,14 @@ if (!project) {
   <section>
     <h2>Debug</h2>
     <div class="debug-content">
-      {project.dockerComposeFileContent && (
-      <details>
-          <summary>Docker Compose file ({project.dockerComposeFilePath})</summary>
-          <Code lang="yaml" code={project.dockerComposeFileContent} />
-        </details>
-      )}
+      {
+        project.dockerComposeFileContent && (
+          <details>
+            <summary>Docker Compose file ({project.dockerComposeFilePath})</summary>
+            <Code lang="yaml" code={project.dockerComposeFileContent} />
+          </details>
+        )
+      }
       <details>
         <summary>Parsed config</summary>
         <pre>{util.inspect(project.dockerCompose, false, 2)}</pre>

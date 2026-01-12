@@ -13,9 +13,7 @@
 import { ErrorResponse, ProcessConfig } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Exec<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Exec<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Starts a previously set up exec instance. If detach is true, this endpoint returns immediately after starting the command. Otherwise, it sets up an interactive session with the command.
    *

@@ -20,12 +20,7 @@ const networks = host.networks.toSorted(
   description="Networks are the virtual networks that containers can connect to. They can be inspected, deleted, and created."
 >
   <div slot="header">
-    <Button
-      icon={Trash2Icon}
-      label="Prune"
-      data-action="networks.prune"
-      theme="danger"
-    />
+    <Button icon={Trash2Icon} label="Prune" data-action="networks.prune" theme="danger" />
   </div>
   <Card>
     <table>
@@ -55,9 +50,7 @@ const networks = host.networks.toSorted(
                   }
                   tooltip={
                     network.containers.length > 0
-                      ? network.containers
-                          .map((container) => container.name)
-                          .join("\n")
+                      ? network.containers.map((container) => container.name).join("\n")
                       : undefined
                   }
                   color={
@@ -67,16 +60,10 @@ const networks = host.networks.toSorted(
                   }
                 />
               </td>
-              <td>
-                {network.createdOn
-                  ? formatUnixTimestamp(network.createdOn)
-                  : "-"}
-              </td>
+              <td>{network.createdOn ? formatUnixTimestamp(network.createdOn) : "-"}</td>
               <td>
                 {network.project ? (
-                  <a href={`/projects/${network.project.name}`}>
-                    {network.project.name}
-                  </a>
+                  <a href={`/projects/${network.project.name}`}>{network.project.name}</a>
                 ) : (
                   "-"
                 )}

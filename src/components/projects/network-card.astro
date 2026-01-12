@@ -36,16 +36,9 @@ const MAX_CONTAINERS_TO_SHOW = 4;
       <div class="card-meta">
         <p>Containers:</p>
         <div>
-          {network.containers
-            .slice(0, MAX_CONTAINERS_TO_SHOW)
-            .map((container) => (
-              <Pill
-                text={container.name}
-                color="var(--color-surface-300)"
-                fill
-                small
-              />
-            ))}
+          {network.containers.slice(0, MAX_CONTAINERS_TO_SHOW).map((container) => (
+            <Pill text={container.name} color="var(--color-surface-300)" fill small />
+          ))}
           {network.containers.length > MAX_CONTAINERS_TO_SHOW && (
             <Pill
               text={`+${network.containers.length - MAX_CONTAINERS_TO_SHOW} more`}

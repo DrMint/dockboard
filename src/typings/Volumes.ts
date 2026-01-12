@@ -19,9 +19,7 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Volumes<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Volumes<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -65,10 +63,7 @@ export class Volumes<
    * @summary Create a volume
    * @request POST:/volumes/create
    */
-  volumeCreate = (
-    volumeConfig: VolumeCreateRequest,
-    params: RequestParams = {}
-  ) =>
+  volumeCreate = (volumeConfig: VolumeCreateRequest, params: RequestParams = {}) =>
     this.request<Volume, ErrorResponse>({
       path: `/volumes/create`,
       method: "POST",

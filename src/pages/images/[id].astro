@@ -15,9 +15,7 @@ if (!id) {
 }
 
 const { host } = Astro.locals;
-const image = host.images.find(
-  (images) => images.id === decodeURIComponent(id)
-);
+const image = host.images.find((images) => images.id === decodeURIComponent(id));
 if (!image) {
   return Astro.redirect("/images");
 }
@@ -101,22 +99,20 @@ if (!image) {
 <script>
   import { actions } from "astro:actions";
 
-  document
-    .querySelectorAll<HTMLButtonElement>("button[data-action]")
-    .forEach((button) => {
-      button.addEventListener("click", async () => {
-        const { action, id } = button.dataset;
-        if (!action || !id) {
-          return;
-        }
-        switch (action) {
-          case "images.delete":
-            await actions.images.delete({ id });
-            window.location.href = "/images";
-            break;
-          default:
-            break;
-        }
-      });
+  document.querySelectorAll<HTMLButtonElement>("button[data-action]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const { action, id } = button.dataset;
+      if (!action || !id) {
+        return;
+      }
+      switch (action) {
+        case "images.delete":
+          await actions.images.delete({ id });
+          window.location.href = "/images";
+          break;
+        default:
+          break;
+      }
     });
+  });
 </script>

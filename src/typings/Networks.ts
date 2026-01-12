@@ -22,9 +22,7 @@ import {
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Networks<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Networks<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Returns a list of networks. For details on the format, see the [network inspect endpoint](#operation/NetworkInspect). Note that it uses a different, smaller representation of a network than inspecting a single network. For example, the list of containers attached to the network is not propagated in API versions 1.28 and up.
    *
@@ -201,11 +199,7 @@ export class Networks<
    * @summary Connect a container to a network
    * @request POST:/networks/{id}/connect
    */
-  networkConnect = (
-    id: string,
-    container: NetworkConnectRequest,
-    params: RequestParams = {}
-  ) =>
+  networkConnect = (id: string, container: NetworkConnectRequest, params: RequestParams = {}) =>
     this.request<void, ErrorResponse>({
       path: `/networks/${id}/connect`,
       method: "POST",

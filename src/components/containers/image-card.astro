@@ -25,11 +25,7 @@ const { image } = Astro.props;
   <div class="card-meta">
     <p>Tags:</p>
     <div>
-      {
-        image.name.tag && (
-          <Pill text={image.name.tag} color="var(--color-surface-300)" fill small />
-        )
-      }
+      {image.name.tag && <Pill text={image.name.tag} color="var(--color-surface-300)" fill small />}
     </div>
   </div>
   {
@@ -62,12 +58,7 @@ const { image } = Astro.props;
   <div class="card-meta">
     <p>Size:</p>
     <div>
-      <Pill
-        text={formatBytes(image.size)}
-        color="var(--color-surface-300)"
-        fill
-        small
-      />
+      <Pill text={formatBytes(image.size)} color="var(--color-surface-300)" fill small />
     </div>
   </div>
 </Card>

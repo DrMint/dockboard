@@ -2,10 +2,7 @@ import z from "zod";
 
 /* Based on this spec https://github.com/compose-spec/compose-spec/blob/main/spec.md */
 
-const arrayOrMapSchema = z.union([
-  z.array(z.string()),
-  z.record(z.string(), z.string()),
-]);
+const arrayOrMapSchema = z.union([z.array(z.string()), z.record(z.string(), z.string())]);
 const arrayOrStringSchema = z.union([z.array(z.string()), z.string()]);
 
 /**
@@ -96,9 +93,7 @@ const serviceBuildSchema = z.union([
       context: z.string(),
       dockerfile: z.string().optional(),
       pull: z.boolean().optional(),
-      args: z
-        .union([z.array(z.string()), z.record(z.string(), z.string())])
-        .optional(),
+      args: z.union([z.array(z.string()), z.record(z.string(), z.string())]).optional(),
     })
     .strict(),
 ]);
@@ -129,11 +124,7 @@ const serviceDependsOnLongSyntaxSchema = z.record(
   z
     .object({
       restart: z.boolean().optional(),
-      condition: z.enum([
-        "service_healthy",
-        "service_started",
-        "service_completed_successfully",
-      ]),
+      condition: z.enum(["service_healthy", "service_started", "service_completed_successfully"]),
       required: z.boolean().optional(),
     })
     .strict()
@@ -143,16 +134,8 @@ const serviceDependsOnSchema = z.union([
   serviceDependsOnLongSyntaxSchema,
 ]);
 
-const serviceEnvironmentVariableSchema = z.union([
-  z.string(),
-  z.number(),
-  z.boolean(),
-  z.null(),
-]);
-const serviceEnvironmentMapSchema = z.record(
-  z.string(),
-  serviceEnvironmentVariableSchema
-);
+const serviceEnvironmentVariableSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+const serviceEnvironmentMapSchema = z.record(z.string(), serviceEnvironmentVariableSchema);
 const serviceEnvironmentArraySchema = z.array(serviceEnvironmentVariableSchema);
 const serviceEnvironmentSchema = z.union([
   serviceEnvironmentMapSchema,
@@ -167,9 +150,7 @@ const serviceNetworkPropertiesSchema = z
     ipv6_address: z.string().optional(),
     link_local_ips: z.array(z.string()).optional(),
     mac_address: z.string().optional(),
-    driver_opts: z
-      .record(z.string(), serviceEnvironmentVariableSchema)
-      .optional(),
+    driver_opts: z.record(z.string(), serviceEnvironmentVariableSchema).optional(),
     gw_priority: z.number().optional(),
     priority: z.number().optional(),
   })
@@ -194,10 +175,7 @@ const servicePortsLongSyntaxSchema = z.array(
     })
     .strict()
 );
-const servicePortsSchema = z.union([
-  servicePortsShortSyntaxSchema,
-  servicePortsLongSyntaxSchema,
-]);
+const servicePortsSchema = z.union([servicePortsShortSyntaxSchema, servicePortsLongSyntaxSchema]);
 
 const serviceSchema = z
   .object({
@@ -291,9 +269,7 @@ const serviceSchema = z
     // TODO: provider
     // TODO: pull_policy
     read_only: z.boolean().optional(),
-    restart: z
-      .enum(["no", "always", "on-failure", "unless-stopped"])
-      .optional(),
+    restart: z.enum(["no", "always", "on-failure", "unless-stopped"]).optional(),
     // TODO: runtime
     // TODO: scale
     // TODO: secrets
@@ -321,9 +297,7 @@ const networkSchema = z
   .object({
     attachable: z.boolean().optional(),
     driver: z.enum(["bridge", "overlay", "host", "none"]).optional(),
-    driver_opts: z
-      .record(z.string(), serviceEnvironmentVariableSchema)
-      .optional(),
+    driver_opts: z.record(z.string(), serviceEnvironmentVariableSchema).optional(),
     enable_ipv4: z.boolean().optional(),
     enable_ipv6: z.boolean().optional(),
     external: z.boolean().optional(),
@@ -337,9 +311,7 @@ const networkSchema = z
 const volumeSchema = z
   .object({
     driver: z.string().optional(),
-    driver_opts: z
-      .record(z.string(), serviceEnvironmentVariableSchema)
-      .optional(),
+    driver_opts: z.record(z.string(), serviceEnvironmentVariableSchema).optional(),
     external: z.boolean().optional(),
     labels: arrayOrMapSchema.optional(),
     name: z.string().optional(),
@@ -352,9 +324,7 @@ export const dockerComposeConfigSchema = z
   .object({})
   .passthrough()
   .transform((obj) =>
-    Object.fromEntries(
-      Object.entries(obj).filter(([key]) => !key.startsWith("x-"))
-    )
+    Object.fromEntries(Object.entries(obj).filter(([key]) => !key.startsWith("x-")))
   )
   .pipe(
     z

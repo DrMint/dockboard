@@ -16,9 +16,7 @@ const { volume } = Astro.props;
     <h3>{volume.name}</h3>
     <Pill
       text={volume.instance ? "Up" : "Down"}
-      color={volume.instance
-        ? "var(--color-border-success)"
-        : "var(--color-border-danger)"}
+      color={volume.instance ? "var(--color-border-success)" : "var(--color-border-danger)"}
     />
   </div>
   {

@@ -23,28 +23,18 @@ if (!container) {
   return Astro.redirect("/containers");
 }
 const isStartable = ["created", "exited"].includes(container.state);
-const isStoppable = ["running", "paused", "restarting"].includes(
-  container.state
-);
-const isRestartable = ["created", "running", "paused"].includes(
-  container.state
-);
-const isKillable = ["running", "paused", "restarting"].includes(
-  container.state
-);
+const isStoppable = ["running", "paused", "restarting"].includes(container.state);
+const isRestartable = ["created", "running", "paused"].includes(container.state);
+const isKillable = ["running", "paused", "restarting"].includes(container.state);
 const isDeletable = ["created", "exited", "dead"].includes(container.state);
 const isPausable = ["running"].includes(container.state);
 const isUnpausable = ["paused"].includes(container.state);
 const isUppable =
-  container.state === "down" &&
-  container.project?.dockerComposeFilePath !== undefined;
+  container.state === "down" && container.project?.dockerComposeFilePath !== undefined;
 ---
 
 <Page
-  title={[
-    { text: "Containers", href: "/containers" },
-    { text: container.name },
-  ]}
+  title={[{ text: "Containers", href: "/containers" }, { text: container.name }]}
   icon={ContainerIcon}
 >
   <div slot="header">
@@ -145,56 +135,54 @@ const isUppable =
 <script>
   import { actions } from "astro:actions";
 
-  document
-    .querySelectorAll<HTMLButtonElement>("button[data-action][data-id]")
-    .forEach((button) => {
-      button.addEventListener("click", async () => {
-        const { action, id, path } = button.dataset;
-        if (!action || !id) {
-          return;
-        }
+  document.querySelectorAll<HTMLButtonElement>("button[data-action][data-id]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const { action, id, path } = button.dataset;
+      if (!action || !id) {
+        return;
+      }
 
-        switch (action) {
-          case "containers.start":
-            await actions.containers.start({ id });
-            window.location.reload();
-            break;
-          case "containers.stop":
-            await actions.containers.stop({ id });
-            window.location.reload();
-            break;
-          case "containers.restart":
-            await actions.containers.restart({ id });
-            window.location.reload();
-            break;
-          case "containers.kill":
-            await actions.containers.kill({ id });
-            window.location.reload();
-            break;
-          case "containers.pause":
-            await actions.containers.pause({ id });
-            window.location.reload();
-            break;
-          case "containers.unpause":
-            await actions.containers.unpause({ id });
-            window.location.reload();
-            break;
-          case "containers.delete":
-            const result = await actions.containers.delete({ id });
-            if (!result.error) {
-              window.location.href = "/containers";
-            }
-            break;
-          case "projects.up":
-            if (!path) return;
-            await actions.projects.up({ path, service: id });
-            window.location.reload();
-            break;
-          default:
-            break;
-        }
-      });
+      switch (action) {
+        case "containers.start":
+          await actions.containers.start({ id });
+          window.location.reload();
+          break;
+        case "containers.stop":
+          await actions.containers.stop({ id });
+          window.location.reload();
+          break;
+        case "containers.restart":
+          await actions.containers.restart({ id });
+          window.location.reload();
+          break;
+        case "containers.kill":
+          await actions.containers.kill({ id });
+          window.location.reload();
+          break;
+        case "containers.pause":
+          await actions.containers.pause({ id });
+          window.location.reload();
+          break;
+        case "containers.unpause":
+          await actions.containers.unpause({ id });
+          window.location.reload();
+          break;
+        case "containers.delete":
+          const result = await actions.containers.delete({ id });
+          if (!result.error) {
+            window.location.href = "/containers";
+          }
+          break;
+        case "projects.up":
+          if (!path) return;
+          await actions.projects.up({ path, service: id });
+          window.location.reload();
+          break;
+        default:
+          break;
+      }
     });
+  });
 </script>
 
 <style>

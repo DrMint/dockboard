@@ -7,10 +7,7 @@ export const formatBytes = (bytes: number) => {
   return (bytes / Math.pow(1024, i)).toFixed(2) + " " + sizes[i];
 };
 
-export const formatUnixTimestamp = (
-  timestamp: number | string | Date,
-  raw?: boolean
-) => {
+export const formatUnixTimestamp = (timestamp: number | string | Date, raw?: boolean) => {
   const date =
     typeof timestamp === "object"
       ? timestamp
@@ -28,7 +25,5 @@ export const capitalize = (string: string) => {
 };
 
 export const formatLongName = (name: string) => {
-  return name.length > 35
-    ? name.substring(0, 16) + "..." + name.substring(name.length - 16)
-    : name;
+  return name.length > 35 ? name.substring(0, 16) + "..." + name.substring(name.length - 16) : name;
 };

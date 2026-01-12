@@ -13,9 +13,7 @@
 import { ErrorResponse, EventMessage } from "./data-contracts";
 import { HttpClient, RequestParams } from "./http-client";
 
-export class Events<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Events<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * @description Stream real-time events from the server. Various objects within Docker report events when something happens to them. Containers report these events: `attach`, `commit`, `copy`, `create`, `destroy`, `detach`, `die`, `exec_create`, `exec_detach`, `exec_start`, `exec_die`, `export`, `health_status`, `kill`, `oom`, `pause`, `rename`, `resize`, `restart`, `start`, `stop`, `top`, `unpause`, `update`, and `prune` Images report these events: `create`, `delete`, `import`, `load`, `pull`, `push`, `save`, `tag`, `untag`, and `prune` Volumes report these events: `create`, `mount`, `unmount`, `destroy`, and `prune` Networks report these events: `create`, `connect`, `disconnect`, `destroy`, `update`, `remove`, and `prune` The Docker daemon reports these events: `reload` Services report these events: `create`, `update`, and `remove` Nodes report these events: `create`, `update`, and `remove` Secrets report these events: `create`, `update`, and `remove` Configs report these events: `create`, `update`, and `remove` The Builder reports `prune` events
    *
