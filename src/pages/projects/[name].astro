@@ -106,17 +106,34 @@ if (!project) {
     )
   }
 
+  {
+    project.dockerComposeFileContent && project.dockerComposeFileRawContent && (
+      <section>
+        <h2>Docker Compose file</h2>
+        {project.dockerComposeFileContent !== project.dockerComposeFileRawContent && (
+          <>
+            <label for="show-raw">Disable environment variables substitution</label>
+            <input type="checkbox" id="show-raw" checked={false} data-action="projects.show-raw" />
+            <Code
+              id="docker-compose-file-raw"
+              style="display: none;"
+              lang="yaml"
+              code={project.dockerComposeFileRawContent}
+            />
+          </>
+        )}
+        <Code
+          id="docker-compose-file-content"
+          lang="yaml"
+          code={project.dockerComposeFileContent}
+        />
+      </section>
+    )
+  }
+
   <section>
     <h2>Debug</h2>
     <div class="debug-content">
-      {
-        project.dockerComposeFileContent && (
-          <details>
-            <summary>Docker Compose file ({project.dockerComposeFilePath})</summary>
-            <Code lang="yaml" code={project.dockerComposeFileContent} />
-          </details>
-        )
-      }
       <details>
         <summary>Parsed config</summary>
         <pre>{util.inspect(project.dockerCompose, false, 2)}</pre>
@@ -139,95 +156,110 @@ if (!project) {
       </details>
     </div>
   </section>
+</Page>
 
-  <style>
-    h2 {
-      margin-bottom: 1em;
-    }
+<style>
+  h2 {
+    margin-bottom: 1em;
+  }
 
-    section {
-      margin-block: 3em;
-    }
+  section {
+    margin-block: 3em;
+  }
 
-    .grid {
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .lint-results {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    padding-left: 0;
+
+    li {
       display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      gap: 16px;
-    }
+      align-items: center;
+      gap: 8px;
 
-    .lint-results {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+      svg {
+        width: 16px;
+        height: 16px;
+      }
 
-      padding-left: 0;
+      &[data-level="error"] {
+        color: var(--color-text-danger);
+      }
 
-      li {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+      &[data-level="warning"] {
+        color: var(--color-text-warning);
+      }
 
-        svg {
-          width: 16px;
-          height: 16px;
-        }
-
-        &[data-level="error"] {
-          color: var(--color-text-danger);
-        }
-
-        &[data-level="warning"] {
-          color: var(--color-text-warning);
-        }
-
-        &[data-level="info"] {
-          color: var(--color-text-neutral);
-        }
+      &[data-level="info"] {
+        color: var(--color-text-neutral);
       }
     }
+  }
 
-    .header-buttons {
-      display: flex;
-      gap: 8px;
-    }
+  .header-buttons {
+    display: flex;
+    gap: 8px;
+  }
 
-    .debug-content {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-  </style>
+  .debug-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+</style>
 
-  <script>
-    import { actions } from "astro:actions";
-    document.querySelectorAll<HTMLElement>("[data-action]").forEach((el) => {
-      el.addEventListener("click", async () => {
-        const { action, path } = el.dataset;
-        if (!action || !path) {
-          return;
-        }
-        switch (action) {
-          case "projects.up":
-            await actions.projects.up({ path });
-            window.location.reload();
-            break;
-          case "projects.down":
-            await actions.projects.down({ path });
-            window.location.reload();
-            break;
-          case "projects.build":
-            await actions.projects.build({ path });
-            window.location.reload();
-            break;
-          case "projects.pull":
-            await actions.projects.pull({ path });
-            window.location.reload();
-            break;
-          default:
-            break;
-        }
-      });
+<script>
+  import { actions } from "astro:actions";
+  document.querySelectorAll<HTMLElement>("[data-action]").forEach((el) => {
+    el.addEventListener("click", async () => {
+      const { action, path } = el.dataset;
+      if (!action || !path) {
+        return;
+      }
+      switch (action) {
+        case "projects.up":
+          await actions.projects.up({ path });
+          window.location.reload();
+          break;
+        case "projects.down":
+          await actions.projects.down({ path });
+          window.location.reload();
+          break;
+        case "projects.build":
+          await actions.projects.build({ path });
+          window.location.reload();
+          break;
+        case "projects.pull":
+          await actions.projects.pull({ path });
+          window.location.reload();
+          break;
+        default:
+          break;
+      }
     });
-  </script>
-</Page>
+  });
+</script>
+
+<script>
+  document.getElementById("show-raw")?.addEventListener("change", (event) => {
+    const { checked } = event.target as HTMLInputElement;
+    const content = document.getElementById("docker-compose-file-content") as HTMLPreElement;
+    const raw = document.getElementById("docker-compose-file-raw") as HTMLPreElement;
+    if (checked) {
+      content.style.display = "none";
+      raw.style.display = "block";
+    } else {
+      content.style.display = "block";
+      raw.style.display = "none";
+    }
+  });
+</script>

@@ -82,6 +82,10 @@ export class Project {
     return this.config?.content;
   }
 
+  get dockerComposeFileRawContent(): string | undefined {
+    return this.config?.rawContent;
+  }
+
   get dockerCompose(): DockerComposeConfig | undefined {
     return this.config?.parsed;
   }
@@ -207,6 +211,7 @@ export class Project {
                 path: config.path,
                 content: config.content,
                 workingDirectory: config.workingDirectory,
+                rawContent: config.rawContent,
                 parsed: config.parsed,
                 error: config.error,
               }
